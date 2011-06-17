@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="processing.js"></script>
+  <script src="traer.physics.js"></script>
+  <script src="init.js"></script>
+<link rel="stylesheet" href="style.css"/></head>
+<body>
+<script type="application/processing">
+
+ParticleSystem physics;
+
+Particle p;
+Particle anchor;
+Spring s;
+Body b;
+void setup()
+{
+  size( 800, 800 );
+  smooth();
+  fill( 0 );
+  ellipseMode( CENTER );
+  
+  physics = new ParticleSystem( 0, 0.04 );
+  //physics.setIntegrator(ParticleSystem.MODIFIED_EULER);      
+  // physics.makeSpring(b.ne, anchor, 0.5, 0.4, 75);
+  anchor = physics.makeParticle( 1.0, width/2, height/2, 0 );
+  anchor.makeFixed(); 
+  // s = physics.makeSpring( p, anchor, 0.5, 0.4, 75 );
+  b = new Body(5);
+  // attach the body to the anchor
+  physics.makeSpring(b.segments[0].ne, anchor, 0.1, 0.4, 75);
+  physics.makeSpring(b.segments[0].nw, anchor, 0.1, 0.4, 75);
+}
+
+void mousePressed()
+{
+   p.makeFixed(); 
+   p.position().set( mouseX, mouseY, 0 );
+}
+
+void mouseDragged()
+{
+  anchor.position().set( mouseX, mouseY, 0 );
+}
+
+void mouseReleased()
+{
+   p.makeFree(); 
+   console.log("released")
+}
+
+void draw()
+{
+  physics.tick();
+    
+  background( 255 );
+  
+  // line( p.position().x(), p.position().y(), anchor.position().x(), anchor.position().y() );
+  // ellipse( anchor.position().x(), anchor.position().y(), 5, 5 );
+  // ellipse( p.position().x(), p.position().y(), 20, 20 );
+  b.draw()
+  update();
+}
+void update()
+{
+  anchor.position().set( (sin(millis()/100)*40+sin(millis()/1200)*400)+width/2, (sin(millis()/300)*30+sin(millis()/1000)*300)+width/2, 0 );  
+}
+// apparently the preprocessor is a little bit wierd, but we should be able to do this type of thing
+
+// the body connects together a bunch of segments
+class Body{
+  BodySegment[] segments;
+  Body(int numSegments){
+    // temp vars
+    w = 10;
+    h = 40;
+    segSpace = 20;
+    segments = new BodySegment[numSegments];
+    for (var i = 0; i < numSegments; i++) {
+      segments[i] = new BodySegment(width/2, h*i, w+sin(i/numSegments*TWO_PI)*w+w, h);
+      // connect the new segment to the previous segment
+      if(i>0){
+        physics.makeSpring(segments[i-1].se, segments[i].ne, 0.1, 0.02, segSpace);
+        physics.makeSpring(segments[i-1].sw, segments[i].nw, 0.1, 0.02, segSpace);
+      }
+    };
+  }
+  void draw(){
+    for (var i = 0; i < segments.length; i++) {
+      segments[i].draw();
+      if(i>0){
+        line( segments[i-1].se.position().x(),segments[i-1].se.position().y(), segments[i].ne.position().x(),segments[i].ne.position().y());
+        line( segments[i-1].sw.position().x(),segments[i-1].sw.position().y(), segments[i].nw.position().x(),segments[i].nw.position().y());
+      }
+    }    
+  }
+}
+
+class BodySegment{
+  float x, y, w, h;
+  Particle ne, se, nw, sw;
+  Spring n, e, s, west;
+  BodySegment(float _x, float _y, float _w, float _h){
+    x = _x;
+    y = _y;
+    w = _w;
+    h = _h;
+    ne = physics.makeParticle(1.0, x+w/2, y+h/2, 0);
+    nw = physics.makeParticle(1.0, x-w/2, y+h/2, 0);
+    se = physics.makeParticle(1.0, x+w/2, y-h/2, 0);
+    sw = physics.makeParticle(1.0, x-w/2, y-h/2, 0);
+    n = physics.makeSpring(ne, nw, 0.5, 0.4, w);
+    e = physics.makeSpring(ne, se, 0.5, 0.4, h);
+    s = physics.makeSpring(se, sw, 0.5, 0.4, w);
+    west = physics.makeSpring(sw, nw, 0.5, 0.4, h);
+
+    // we also need crossbars to keep everything from flipping out
+    physics.makeSpring(ne, sw, 0.1, 0.35, sqrt(sq(w)+sq(h)))
+    physics.makeSpring(nw, se, 0.1, 0.35, sqrt(sq(w)+sq(h)))
+  }
+  void draw(){
+    ellipse(ne.position().x(),ne.position().y(),5,5);
+    ellipse(nw.position().x(),nw.position().y(),5,5);
+    ellipse(se.position().x(),se.position().y(),5,5);
+    ellipse(sw.position().x(),sw.position().y(),5,5);
+  }
+}
+
+
+</script>
+<canvas width="200" height="200"></canvas>
+<div style="height:0px;width:0px;overflow:hidden;"></div>
+
+</body>
+</html>
