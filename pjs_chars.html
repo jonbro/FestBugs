@@ -11,9 +11,10 @@
 ParticleSystem physics;
 
 Particle p;
-Particle anchor;
 Spring s;
-Body b;
+Body b, b2;
+Body[] bodies;
+
 void setup()
 {
   size( 800, 800 );
@@ -24,76 +25,93 @@ void setup()
   physics = new ParticleSystem( 0, 0.04 );
   //physics.setIntegrator(ParticleSystem.MODIFIED_EULER);      
   // physics.makeSpring(b.ne, anchor, 0.5, 0.4, 75);
-  anchor = physics.makeParticle( 1.0, width/2, height/2, 0 );
-  anchor.makeFixed(); 
   // s = physics.makeSpring( p, anchor, 0.5, 0.4, 75 );
-  b = new Body(5);
-  // attach the body to the anchor
-  physics.makeSpring(b.segments[0].ne, anchor, 0.1, 0.4, 75);
-  physics.makeSpring(b.segments[0].nw, anchor, 0.1, 0.4, 75);
+  bodies = new Body[5];
+  for (var i = bodies.length - 1; i >= 0; i--) {
+    len = ceil(random()*3)+2;
+    console.log(len);
+    bodies[i] = new Body(len, noise(i, i)*width, noise(i, i)*height);
+  };
 }
 
 void mousePressed()
 {
-   p.makeFixed(); 
-   p.position().set( mouseX, mouseY, 0 );
 }
 
 void mouseDragged()
 {
-  anchor.position().set( mouseX, mouseY, 0 );
 }
 
 void mouseReleased()
 {
-   p.makeFree(); 
-   console.log("released")
 }
 
 void draw()
 {
   physics.tick();
-    
   background( 255 );
-  
-  // line( p.position().x(), p.position().y(), anchor.position().x(), anchor.position().y() );
-  // ellipse( anchor.position().x(), anchor.position().y(), 5, 5 );
-  // ellipse( p.position().x(), p.position().y(), 20, 20 );
-  b.draw()
+  for (var i = bodies.length - 1; i >= 0; i--) {
+    bodies[i].draw();
+  };  
   update();
 }
 void update()
 {
-  anchor.position().set( (sin(millis()/100)*40+sin(millis()/1200)*400)+width/2, (sin(millis()/300)*30+sin(millis()/1000)*300)+width/2, 0 );  
+  for (var i = bodies.length - 1; i >= 0; i--) {
+    bodies[i].update();
+  };  
 }
 // apparently the preprocessor is a little bit wierd, but we should be able to do this type of thing
 
 // the body connects together a bunch of segments
 class Body{
   BodySegment[] segments;
-  Body(int numSegments){
+  Particle anchor;
+  float p1, p2;
+  Body(int numSegments, float x, float y){
+
+    anchor = physics.makeParticle( 1.0, x, y, 0 );
+    anchor.makeFixed(); 
+
     // temp vars
     w = 10;
     h = 40;
+
     segSpace = 20;
     segments = new BodySegment[numSegments];
     for (var i = 0; i < numSegments; i++) {
       segments[i] = new BodySegment(width/2, h*i, w+sin(i/numSegments*TWO_PI)*w+w, h);
       // connect the new segment to the previous segment
       if(i>0){
-        physics.makeSpring(segments[i-1].se, segments[i].ne, 0.1, 0.02, segSpace);
-        physics.makeSpring(segments[i-1].sw, segments[i].nw, 0.1, 0.02, segSpace);
+        physics.makeSpring(segments[i-1].se, segments[i].ne, 0.1, 0.5, segSpace);
+          physics.makeSpring(segments[i-1].sw, segments[i].nw, 0.1, 0.5, segSpace);
       }
     };
+
+    // connect the head of the body to the anchor
+    physics.makeSpring(segments[0].ne, anchor, 0.1, 0.4, 75);
+    physics.makeSpring(segments[0].nw, anchor, 0.1, 0.4, 75);
+
+    // the period for running the animation
+    p1 = 100 + (random()*2-1) * 50;
+    p2 = 1000 + (random()*2-1) * 500;
   }
+
   void draw(){
     for (var i = 0; i < segments.length; i++) {
       segments[i].draw();
       if(i>0){
-        line( segments[i-1].se.position().x(),segments[i-1].se.position().y(), segments[i].ne.position().x(),segments[i].ne.position().y());
-        line( segments[i-1].sw.position().x(),segments[i-1].sw.position().y(), segments[i].nw.position().x(),segments[i].nw.position().y());
+        quad(
+          segments[i-1].se.position().x(),segments[i-1].se.position().y(),
+          segments[i-1].sw.position().x(),segments[i-1].sw.position().y(),
+          segments[i].nw.position().x(),segments[i].nw.position().y(),
+          segments[i].ne.position().x(),segments[i].ne.position().y()
+        );
       }
     }    
+  }
+  void update(){
+    anchor.position().set( (sin(millis()/p1)*40+sin(millis()/p2)*400)+width/2, (sin(millis()/300)*30+sin(millis()/1000)*300)+width/2, 0 );
   }
 }
 
@@ -116,14 +134,17 @@ class BodySegment{
     west = physics.makeSpring(sw, nw, 0.5, 0.4, h);
 
     // we also need crossbars to keep everything from flipping out
-    physics.makeSpring(ne, sw, 0.1, 0.35, sqrt(sq(w)+sq(h)))
-    physics.makeSpring(nw, se, 0.1, 0.35, sqrt(sq(w)+sq(h)))
+    physics.makeSpring(ne, sw, 0.01, 0.15, sqrt(sq(w)+sq(h)))
+    physics.makeSpring(nw, se, 0.01, 0.15, sqrt(sq(w)+sq(h)))
   }
   void draw(){
-    ellipse(ne.position().x(),ne.position().y(),5,5);
-    ellipse(nw.position().x(),nw.position().y(),5,5);
-    ellipse(se.position().x(),se.position().y(),5,5);
-    ellipse(sw.position().x(),sw.position().y(),5,5);
+    // clockwise
+    quad(
+      se.position().x(),se.position().y(), sw.position().x(),sw.position().y(),nw.position().x(),nw.position().y(),ne.position().x(),ne.position().y())
+    // ellipse(ne.position().x(),ne.position().y(),5,5);
+    // ellipse(nw.position().x(),nw.position().y(),5,5);
+    // ellipse(se.position().x(),se.position().y(),5,5);
+    // ellipse(sw.position().x(),sw.position().y(),5,5);
   }
 }
 
