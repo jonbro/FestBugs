@@ -14,26 +14,28 @@ ParticleSystem physics;
 Particle p;
 Spring s;
 Body body;
-         var   b2Vec2 = Box2D.Common.Math.b2Vec2
-            ,  b2AABB = Box2D.Collision.b2AABB
-          , b2BodyDef = Box2D.Dynamics.b2BodyDef
-          , b2Body = Box2D.Dynamics.b2Body
-          , b2FixtureDef = Box2D.Dynamics.b2FixtureDef
-          , b2Fixture = Box2D.Dynamics.b2Fixture
-          , b2World = Box2D.Dynamics.b2World
-          , b2MassData = Box2D.Collision.Shapes.b2MassData
-          , b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape
-          , b2CircleShape = Box2D.Collision.Shapes.b2CircleShape
-          , b2DebugDraw = Box2D.Dynamics.b2DebugDraw
-          , b2MouseJointDef =  Box2D.Dynamics.Joints.b2MouseJointDef
-          , b2DistanceJointDef =  Box2D.Dynamics.Joints.b2DistanceJointDef
-          , b2Math = Box2D.Common.Math.b2Math
-            ;
-         
-         var world = new b2World(
-               new b2Vec2(0, 20)    //gravity
-            ,  true                 //allow sleep
-         );
+var b2Vec2 = Box2D.Common.Math.b2Vec2
+  , b2AABB = Box2D.Collision.b2AABB
+  , b2BodyDef = Box2D.Dynamics.b2BodyDef
+  , b2Body = Box2D.Dynamics.b2Body
+  , b2FixtureDef = Box2D.Dynamics.b2FixtureDef
+  , b2Fixture = Box2D.Dynamics.b2Fixture
+  , b2World = Box2D.Dynamics.b2World
+  , b2MassData = Box2D.Collision.Shapes.b2MassData
+  , b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape
+  , b2CircleShape = Box2D.Collision.Shapes.b2CircleShape
+  , b2DebugDraw = Box2D.Dynamics.b2DebugDraw
+  , b2MouseJointDef =  Box2D.Dynamics.Joints.b2MouseJointDef
+  , b2DistanceJointDef =  Box2D.Dynamics.Joints.b2DistanceJointDef
+  , b2Math = Box2D.Common.Math.b2Math
+  ;
+
+var world = new b2World(
+     new b2Vec2(0, 20)    //gravity
+  ,  true                 //allow sleep
+);
+var selectedBody, mouseJoint;
+var ratio = 30; // for converting box2d units to display and vice versa
 var doSleep = true;
 var timeStep = 1.0/30;
 var iteration = 12;
@@ -52,25 +54,26 @@ void setup()
   fill( 0 );
   ellipseMode( CENTER );
   body = new Body();
-           var fixDef = new b2FixtureDef;
-         fixDef.density = 1.0;
-         fixDef.friction = 0.5;
-         fixDef.restitution = 0.2;
 
-           var bodyDef = new b2BodyDef;
-
-           bodyDef.type = b2Body.b2_staticBody;
-         fixDef.shape = new b2PolygonShape;
-         fixDef.shape.SetAsBox(20, 2);
-         bodyDef.position.Set(10, 400 / 30 + 1.8);
-         world.CreateBody(bodyDef).CreateFixture(fixDef);
-         bodyDef.position.Set(10, -1.8);
-         world.CreateBody(bodyDef).CreateFixture(fixDef);
-         fixDef.shape.SetAsBox(2, 14);
-         bodyDef.position.Set(-1.8, 13);
-         world.CreateBody(bodyDef).CreateFixture(fixDef);
-         bodyDef.position.Set(21.8, 13);
-         world.CreateBody(bodyDef).CreateFixture(fixDef);
+  // create the view box, so we don't lose stuff
+  // off the screen
+  var fixDef = new b2FixtureDef;
+  fixDef.density = 1.0;
+  fixDef.friction = 0.5;
+  fixDef.restitution = 0.2;
+  var bodyDef = new b2BodyDef;
+  bodyDef.type = b2Body.b2_staticBody;
+  fixDef.shape = new b2PolygonShape;
+  fixDef.shape.SetAsBox(20, 2);
+  bodyDef.position.Set(10, 400 / 30 + 1.8);
+  world.CreateBody(bodyDef).CreateFixture(fixDef);
+  bodyDef.position.Set(10, -1.8);
+  world.CreateBody(bodyDef).CreateFixture(fixDef);
+  fixDef.shape.SetAsBox(2, 14);
+  bodyDef.position.Set(-1.8, 13);
+  world.CreateBody(bodyDef).CreateFixture(fixDef);
+  bodyDef.position.Set(21.8, 13);
+  world.CreateBody(bodyDef).CreateFixture(fixDef);
 
 }
 
@@ -94,11 +97,62 @@ void draw()
               world.DrawDebugData();
 
   world.ClearForces();
-  // drawWorld(world);
+  update();
 }
-void update()
-{
+b2Body getBodyAtMouse() {
+  mousePVec = new b2Vec2(mouseX/30, mouseY/30);
+  var aabb = new b2AABB();
+  aabb.lowerBound.Set(mouseX/30 - 0.001, mouseY/30 - 0.001);
+  aabb.upperBound.Set(mouseX/30 + 0.001, mouseY/30 + 0.001);
+  
+  // Query the world for overlapping shapes.
+  //console.log(mouseX/30, mouseY/30, aabb)
+  selectedBody = null;
+  world.QueryAABB(function(fixture) {
+    console.log(fixture);
+    if(fixture.GetBody().GetType() != b2Body.b2_staticBody) {
+       if(fixture.GetShape().TestPoint(fixture.GetBody().GetTransform(), mousePVec)) {
+          selectedBody = fixture.GetBody();
+          return false;
+       }
+    }
+    return true;
+  }, aabb);
+  return selectedBody;
 }
+
+
+void update() {
+
+  if(mousePressed && (!mouseJoint)) {
+     var body = getBodyAtMouse();
+     if(body) {
+        var md = new b2MouseJointDef();
+        md.bodyA = world.GetGroundBody();
+        md.bodyB = body;
+        md.target.Set(mouseX/30, mouseY/30);
+        md.collideConnected = true;
+        md.maxForce = 300.0 * body.GetMass();
+        mouseJoint = world.CreateJoint(md);
+        body.SetAwake(true);
+     }
+  }
+  
+  if(mouseJoint) {
+     if(mousePressed) {
+        mouseJoint.SetTarget(new b2Vec2(mouseX/30, mouseY/30));
+        //mouseJoint.SetTarget(new b2Vec2(mouseX, mouseY));
+     } else {
+        world.DestroyJoint(mouseJoint);
+        mouseJoint = null;
+     }
+  }
+
+  world.Step(1 / 60, 10, 10);
+  world.DrawDebugData();
+  world.ClearForces();
+};
+
 
 void drawShape(shape,body) {
   poly = shape;
@@ -106,7 +160,7 @@ void drawShape(shape,body) {
   for (var i = 0; i < poly.m_vertexCount; i++) {
     b2Vec2 v = b2Math.MulMV(body.GetTransform().R, poly.GetVertices()[i]);
     v = b2Math.AddVV(v, body.GetWorldCenter());
-    vertex(v.x*width/20, v.y*height/20);
+    vertex(v.x*ratio, v.y*ratio);
   }
   endShape();
 }
@@ -152,6 +206,7 @@ class BodySegment{
 
 class Body{
   BodySegment[] seg;
+  b2MouseJoint mouseJoint;
   Body(){
     seg = new BodySegment[5];
     for (var i = 0; i < seg.length; i++) {
@@ -162,11 +217,27 @@ class Body{
         world.CreateJoint(joint);
       }
     };
+    // attach the body to a joint so that we can chuck it around
+    // var bControlDef = new b2MouseJointDef();
+    // bControlDef.bodyA = world.GetGroundBody();
+    // bControlDef.bodyB = seg[0].wbody;
+
+    // bControlDef.target.Set(200/30, 200/30);
+    // bControlDef.collideConnected = false;
+    // bControlDef.maxForce = 300.0 * seg[0].wbody.GetMass();
+    // mouseJoint = world.CreateJoint(bControlDef);
+
   }
   void draw(){
     for (var i = seg.length - 1; i >= 0; i--) {
       seg[i].draw();
     };
+    // mouseX = mouseX/ratio;
+    // mouseY = mouseY/ratio;
+    //console.log(sin(millis()/100)*width/ratio+(width/ratio));
+    // console.log(mouseX, mouseY);
+    // if(mouseX > 0 && mouseY > 0)
+    //    mouseJoint.SetTarget(mouseX, mouseY);
   }
 }
 
