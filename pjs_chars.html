@@ -13,7 +13,7 @@ ParticleSystem physics;
 
 Particle p;
 Spring s;
-Body body;
+Body[] bodies;
 var b2Vec2 = Box2D.Common.Math.b2Vec2
   , b2AABB = Box2D.Collision.b2AABB
   , b2BodyDef = Box2D.Dynamics.b2BodyDef
@@ -54,7 +54,12 @@ void setup()
   smooth();
   fill( 0 );
   ellipseMode( CENTER );
-  body = new Body();
+
+  bodies = new Body[3];
+  for (var i = 0; i < bodies.length; i++) {
+    bodies[i] = new Body(Math.ceil(Math.random()*5), Math.random()*500, Math.random()*400, Math.random()*20+20, Math.random()*40+30);
+    console.log(bodies.length);
+  };
 
   // create the view box, so we don't lose stuff
   // off the screen
@@ -93,7 +98,9 @@ void mouseReleased()
 void draw()
 {
   background(255);
-  body.draw();
+  for (var i = 0; i < bodies.length; i++) {
+    bodies[i].draw();
+  };
   update();
   world.Step(1 / 60, 10, 10);
   world.DrawDebugData();
@@ -124,29 +131,6 @@ b2Body getBodyAtMouse() {
 
 void update() {
 
-  if(mousePressed && (!mouseJoint)) {
-     var body = getBodyAtMouse();
-     if(body) {
-        var md = new b2MouseJointDef();
-        md.bodyA = world.GetGroundBody();
-        md.bodyB = body;
-        md.target.Set(mouseX/30, mouseY/30);
-        md.collideConnected = true;
-        md.maxForce = 300.0 * body.GetMass();
-        mouseJoint = world.CreateJoint(md);
-        body.SetAwake(true);
-     }
-  }
-  
-  if(mouseJoint) {
-     if(mousePressed) {
-        mouseJoint.SetTarget(new b2Vec2(mouseX/30, mouseY/30));
-        //mouseJoint.SetTarget(new b2Vec2(mouseX, mouseY));
-     } else {
-        world.DestroyJoint(mouseJoint);
-        mouseJoint = null;
-     }
-  }
 
 };
 
@@ -177,15 +161,15 @@ class BodySegment{
   b2Body ne, se, sw, nw;
   b2DistanceJoint n, s, e, west;
 
-  BodySegment(float _x, float _y, float _w, float _h){
+  BodySegment(float _x, float _y, float _w, float _h, r){
     x = _x;
     y = _y;
     w = _w;
     h = _h;
-    ne = createNode(x+w/2, y-h/2, 10);
-    nw = createNode(x-w/2, y-h/2, 10);
-    se = createNode(x+w/2, y+h/2, 10);
-    sw = createNode(x-w/2, y+h/2, 10);
+    ne = createNode(x+w/2, y-h/2, r);
+    nw = createNode(x-w/2, y-h/2, r);
+    se = createNode(x+w/2, y+h/2, r);
+    sw = createNode(x-w/2, y+h/2, r);
     // set up all the distance joints that will keep the segments apart
     //n
     sideDamp = 0.03;
@@ -209,7 +193,7 @@ void createJoint(a, b, d){
   joint = new b2DistanceJointDef();
   joint.Initialize(a, b, a.GetWorldCenter(), b.GetWorldCenter());
   joint.dampingRatio = d;
-  joint.frequencyHz = 2.0;
+  joint.frequencyHz = 1.0;
   return world.CreateJoint(joint);
 }
 void createNode(x, y, r){
@@ -237,10 +221,10 @@ class Body{
   BodySegment[] seg;
   b2Body head;
   b2MouseJoint mouseJoint;
-  Body(){
-    seg = new BodySegment[5];
+  Body(numSegments, x, y, w, h){
+    seg = new BodySegment[numSegments];
     for (var i = 0; i < seg.length; i++) {
-      seg[i] = new BodySegment(10/ratio, (i*30)/ratio, 20/ratio, 40/ratio);
+      seg[i] = new BodySegment((x+10)/ratio, (y+i*30)/ratio, w/ratio, h/ratio, (numSegments-i)*3);
       // connect the body segments
       if(i>0){
         createJoint(seg[i].ne, seg[i-1].se, 0.000002)
@@ -251,7 +235,7 @@ class Body{
       }
     };
     // create a head
-    head = createNode(10/ratio, -30/ratio, 10);
+    head = createNode((x+10)/ratio, (y-1*30)/ratio, numSegments*3);
     // attach the head
     createJoint(seg[0].ne, head, 0.9);
     createJoint(seg[0].nw, head, 0.9);
