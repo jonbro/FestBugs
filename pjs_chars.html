@@ -18,6 +18,7 @@ var b2Vec2 = Box2D.Common.Math.b2Vec2
   , b2AABB = Box2D.Collision.b2AABB
   , b2BodyDef = Box2D.Dynamics.b2BodyDef
   , b2Body = Box2D.Dynamics.b2Body
+  , b2Shape = Box2D.Collision.Shapes.b2Shape
   , b2FixtureDef = Box2D.Dynamics.b2FixtureDef
   , b2Fixture = Box2D.Dynamics.b2Fixture
   , b2World = Box2D.Dynamics.b2World
@@ -152,53 +153,84 @@ void update() {
 
 
 void drawShape(shape,body) {
-  poly = shape;
-  beginShape();
-  for (var i = 0; i < poly.m_vertexCount; i++) {
-    b2Vec2 v = b2Math.MulMV(body.GetTransform().R, poly.GetVertices()[i]);
-    v = b2Math.AddVV(v, body.GetWorldCenter());
-    vertex(v.x*ratio, v.y*ratio);
+  switch(shape.m_type){
+    case b2Shape.e_circleShape:
+      var center = b2Math.MulX(body.m_xf, shape.m_p);
+      var radius = shape.m_radius;
+      ellipse(center.x*ratio, center.y*ratio, radius*ratio*2, radius*ratio*2);
+    case b2Shape.e_polygonShape:
+      poly = shape;
+      // console.log(shape.GetType())
+      beginShape();
+      for (var i = 0; i < poly.m_vertexCount; i++) {
+        b2Vec2 v = b2Math.MulMV(body.GetTransform().R, poly.GetVertices()[i]);
+        v = b2Math.AddVV(v, body.GetWorldCenter());
+        vertex(v.x*ratio, v.y*ratio);
+      }
+      endShape();
+      break;
   }
-  endShape();
 }
 
 // apparently the preprocessor is a little bit wierd, but we should be able to do this type of thing
 class BodySegment{
   float x, y, w, h;
-  b2FixtureDef fixDef;
-  b2BodyDef body;
-  b2Body wbody;
+  b2Body ne, se, sw, nw;
+  b2DistanceJoint n, s, e, west;
+
   BodySegment(float _x, float _y, float _w, float _h){
     x = _x;
     y = _y;
     w = _w;
     h = _h;
-    
+    ne = createNode(x+w/2, y-h/2, 10);
+    nw = createNode(x-w/2, y-h/2, 10);
+    se = createNode(x+w/2, y+h/2, 10);
+    sw = createNode(x-w/2, y+h/2, 10);
+    // set up all the distance joints that will keep the segments apart
+    //n
+    sideDamp = 0.3;
+    n     = createJoint(ne, nw, sideDamp);
+    e     = createJoint(ne, se, sideDamp);
+    s     = createJoint(sw, se, sideDamp);
+    west  = createJoint(sw, nw, sideDamp);
+    console.log(west.GetDampingRatio());
+    // create the cross joints
+    createJoint(ne, sw, 0.005);
+    createJoint(nw, se, 0.005);
+  }
+  void draw(){
+    drawShape(ne.shape, ne);
+    drawShape(nw.shape, nw);
+    drawShape(se.shape, se);
+    drawShape(sw.shape, sw);
+  }
+  void createNode(x, y, r){
     fixDef = new b2FixtureDef();
     fixDef.density = 1.0;
     fixDef.friction = 0.5;
     fixDef.restitution = 0.2;
-
     // the shape definition
-    fixDef.shape = new b2PolygonShape;
-    fixDef.shape.SetAsBox(
-      w/2,
-      h/2
+    fixDef.shape = new b2CircleShape(
+      r/2/ratio //radius
     );
     // the body definition
-    body = new b2BodyDef();
-    body.type = b2Body.b2_dynamicBody;
-
-    body.position.Set(x,y);
-
+    bodyDef = new b2BodyDef();
+    bodyDef.type = b2Body.b2_dynamicBody;
+    bodyDef.position.Set(x,y);
     // the body in the world, I don't know the diff between this and the main body def
-    wbody = world.CreateBody(body);
-    wbody.CreateFixture(fixDef);
+    body = world.CreateBody(bodyDef);
+    body.CreateFixture(fixDef);
+    body.shape = fixDef.shape;
+    return body;
   }
-
-  void draw(){
-      drawShape(fixDef.shape, wbody);
-  }
+}
+void createJoint(a, b, d){
+  joint = new b2DistanceJointDef();
+  joint.Initialize(a, b, a.GetWorldCenter(), b.GetWorldCenter());
+  joint.dampingRatio = d;
+  joint.frequencyHz = 6.0;
+  return world.CreateJoint(joint);
 }
 
 class Body{
@@ -207,22 +239,25 @@ class Body{
   Body(){
     seg = new BodySegment[5];
     for (var i = 0; i < seg.length; i++) {
-      seg[i] = new BodySegment(0*30, (i*20)/30, 20/30, 20/30);
+      seg[i] = new BodySegment(10/30, (i*30)/30, 20/30, 20/30);
+      // connect the body segments
       if(i>0){
-        joint = new b2DistanceJointDef();
-        joint.Initialize(seg[i-1].wbody, seg[i].wbody, seg[i-1].wbody.GetWorldCenter(), seg[i].wbody.GetWorldCenter());
-        world.CreateJoint(joint);
+        createJoint(seg[i].ne, seg[i-1].se, 0.9);
+        createJoint(seg[i].nw, seg[i-1].sw, 0.9);
+        // and crossbars
+        createJoint(seg[i].ne, seg[i-1].sw, 0.9);
+        createJoint(seg[i].nw, seg[i-1].se, 0.9);
       }
     };
-    //attach the body to a joint so that we can chuck it around
-    var bControlDef = new b2MouseJointDef();
-    bControlDef.bodyA = world.GetGroundBody();
-    bControlDef.bodyB = seg[0].wbody;
+    // //attach the body to a joint so that we can chuck it around
+    // var bControlDef = new b2MouseJointDef();
+    // bControlDef.bodyA = world.GetGroundBody();
+    // bControlDef.bodyB = seg[0].wbody;
 
-    bControlDef.target.Set(seg[0].wbody.GetPosition().x, seg[0].wbody.GetPosition().y);
-    bControlDef.collideConnected = true;
-    bControlDef.maxForce = 300.0 * seg[0].wbody.GetMass();
-    mouseJoint = world.CreateJoint(bControlDef);
+    // bControlDef.target.Set(seg[0].wbody.GetPosition().x, seg[0].wbody.GetPosition().y);
+    // bControlDef.collideConnected = true;
+    // bControlDef.maxForce = 300.0 * seg[0].wbody.GetMass();
+    // mouseJoint = world.CreateJoint(bControlDef);
 
   }
   void draw(){
@@ -233,8 +268,8 @@ class Body{
     // mouseY = mouseY/ratio;
     //console.log(sin(millis()/100)*width/ratio+(width/ratio));
     // console.log(mouseX, mouseY);
-    if(mouseX/30 > 0 && mouseY/30 > 0)
-       mouseJoint.SetTarget(new b2Vec2(mouseX/30, mouseY/30));
+    // if(mouseX/30 > 0 && mouseY/30 > 0)
+    //    mouseJoint.SetTarget(new b2Vec2(mouseX/30, mouseY/30));
   }
 }
 
