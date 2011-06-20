@@ -57,7 +57,7 @@ void setup()
 
   bodies = new Body[3];
   for (var i = 0; i < bodies.length; i++) {
-    bodies[i] = new Body(Math.ceil(Math.random()*5), Math.random()*500, Math.random()*400, Math.random()*20+20, Math.random()*40+30);
+    bodies[i] = new Body(Math.ceil(Math.random()*5), Math.random()*500, Math.random()*400, Math.random()*40+20, Math.random()*40+20);
     console.log(bodies.length);
   };
 
@@ -97,6 +97,7 @@ void mouseReleased()
 
 void draw()
 {
+  colorMode(RGB, 255)
   background(255);
   for (var i = 0; i < bodies.length; i++) {
     bodies[i].draw();
@@ -221,32 +222,49 @@ class Body{
   BodySegment[] seg;
   b2Body head;
   b2MouseJoint mouseJoint;
+  float p1, p2;
+  color c;
   Body(numSegments, x, y, w, h){
     seg = new BodySegment[numSegments];
     for (var i = 0; i < seg.length; i++) {
-      seg[i] = new BodySegment((x+10)/ratio, (y+i*30)/ratio, w/ratio, h/ratio, (numSegments-i)*3);
+        seg[i] = new BodySegment((x+10)/ratio, (y+i*(h*1.3))/ratio, w/ratio, h/ratio, (numSegments-i)/numSegments*12+1);
       // connect the body segments
       if(i>0){
-        createJoint(seg[i].ne, seg[i-1].se, 0.000002)
-        createJoint(seg[i].nw, seg[i-1].sw, 0.000002);
+        createJoint(seg[i].ne, seg[i-1].se, 0.002)
+        createJoint(seg[i].nw, seg[i-1].sw, 0.002);
         // // and crossbars
-        // createJoint(seg[i].ne, seg[i-1].sw, 0.9);
+        createJoint(seg[i].ne, seg[i-1].sw, 0.9);
         // createJoint(seg[i].nw, seg[i-1].se, 0.9);
       }
     };
     // create a head
-    head = createNode((x+10)/ratio, (y-1*30)/ratio, numSegments*3);
+    head = createNode((x+10)/ratio, (y-1*30)/ratio, 13);
     // attach the head
     createJoint(seg[0].ne, head, 0.9);
     createJoint(seg[0].nw, head, 0.9);
+    p1 = 100 + (random()*2-1) * 50;
+    p2 = 1000 + (random()*2-1) * 500;
+    colorMode(HSB, 100);
+    c = color(Math.random()*100, 100, 50);
   }
 
   void draw(){
+    // for (var i = seg.length - 1; i >= 0; i--) {
+    //   seg[i].draw();
+    // };
+    // draw as a tape
+    fill(c);
+    noStroke();
     for (var i = seg.length - 1; i >= 0; i--) {
-      seg[i].draw();
+      beginShape();
+      vertex(seg[i].ne.GetWorldCenter().x*ratio, seg[i].ne.GetWorldCenter().y*ratio);
+      vertex(seg[i].se.GetWorldCenter().x*ratio, seg[i].se.GetWorldCenter().y*ratio);
+      vertex(seg[i].sw.GetWorldCenter().x*ratio, seg[i].sw.GetWorldCenter().y*ratio);
+      vertex(seg[i].nw.GetWorldCenter().x*ratio, seg[i].nw.GetWorldCenter().y*ratio);
+      endShape();
     };
     // apply a force to the head
-    head.ApplyForce(new b2Vec2(sin(millis()/1500)*5*noise(millis()/1300)/ratio, sin(millis()/1700)*5/ratio), head.GetWorldCenter())
+    head.ApplyForce(new b2Vec2((noise(millis()/p1)+sin(millis()/p2))*10/ratio, (noise(millis()/p1)+cos(millis()/p2))*10/ratio), head.GetWorldCenter())
 
   }
 }
