@@ -93,11 +93,11 @@ void draw()
 {
   background(255);
   body.draw();
+  update();
   world.Step(1 / 60, 10, 10);
               world.DrawDebugData();
 
   world.ClearForces();
-  update();
 }
 b2Body getBodyAtMouse() {
   mousePVec = new b2Vec2(mouseX/30, mouseY/30);
@@ -148,9 +148,6 @@ void update() {
      }
   }
 
-  world.Step(1 / 60, 10, 10);
-  world.DrawDebugData();
-  world.ClearForces();
 };
 
 
@@ -210,22 +207,22 @@ class Body{
   Body(){
     seg = new BodySegment[5];
     for (var i = 0; i < seg.length; i++) {
-      seg[i] = new BodySegment(0, i+0.5, 1, 1);
+      seg[i] = new BodySegment(0*30, (i*20)/30, 20/30, 20/30);
       if(i>0){
         joint = new b2DistanceJointDef();
         joint.Initialize(seg[i-1].wbody, seg[i].wbody, seg[i-1].wbody.GetWorldCenter(), seg[i].wbody.GetWorldCenter());
         world.CreateJoint(joint);
       }
     };
-    // attach the body to a joint so that we can chuck it around
-    // var bControlDef = new b2MouseJointDef();
-    // bControlDef.bodyA = world.GetGroundBody();
-    // bControlDef.bodyB = seg[0].wbody;
+    //attach the body to a joint so that we can chuck it around
+    var bControlDef = new b2MouseJointDef();
+    bControlDef.bodyA = world.GetGroundBody();
+    bControlDef.bodyB = seg[0].wbody;
 
-    // bControlDef.target.Set(200/30, 200/30);
-    // bControlDef.collideConnected = false;
-    // bControlDef.maxForce = 300.0 * seg[0].wbody.GetMass();
-    // mouseJoint = world.CreateJoint(bControlDef);
+    bControlDef.target.Set(seg[0].wbody.GetPosition().x, seg[0].wbody.GetPosition().y);
+    bControlDef.collideConnected = true;
+    bControlDef.maxForce = 300.0 * seg[0].wbody.GetMass();
+    mouseJoint = world.CreateJoint(bControlDef);
 
   }
   void draw(){
@@ -236,8 +233,8 @@ class Body{
     // mouseY = mouseY/ratio;
     //console.log(sin(millis()/100)*width/ratio+(width/ratio));
     // console.log(mouseX, mouseY);
-    // if(mouseX > 0 && mouseY > 0)
-    //    mouseJoint.SetTarget(mouseX, mouseY);
+    if(mouseX/30 > 0 && mouseY/30 > 0)
+       mouseJoint.SetTarget(new b2Vec2(mouseX/30, mouseY/30));
   }
 }
 
