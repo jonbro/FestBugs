@@ -57,7 +57,7 @@ void setup()
 
   bodies = new Body[3];
   for (var i = 0; i < bodies.length; i++) {
-    bodies[i] = new Body(Math.ceil(Math.random()*5), Math.random()*500, Math.random()*400, Math.random()*40+20, Math.random()*40+20);
+    bodies[i] = new Body(Math.ceil(Math.random()*5)+2, Math.random()*500, Math.random()*400, Math.random()*40+20, Math.random()*40+20);
     console.log(bodies.length);
   };
 
@@ -263,8 +263,15 @@ class Body{
       vertex(seg[i].nw.GetWorldCenter().x*ratio, seg[i].nw.GetWorldCenter().y*ratio);
       endShape();
     };
+    // calculate a vector to the center of the screen from the head
+    worldCenter = new b2Vec2(300/ratio, 200/ratio); // TODO: I should stop hard coding this at some point
+    headCenter = head.GetWorldCenter();
+
+    worldCenter.Subtract(headCenter);
+    worldCenter.Normalize();
+    worldCenter.Multiply((sin(millis()/p1)*5)+5);
     // apply a force to the head
-    head.ApplyForce(new b2Vec2((noise(millis()/p1)+sin(millis()/p2))*10/ratio, (noise(millis()/p1)+cos(millis()/p2))*10/ratio), head.GetWorldCenter())
+    head.ApplyForce(worldCenter, head.GetWorldCenter())
 
   }
 }
