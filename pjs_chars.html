@@ -63,23 +63,23 @@ void setup()
 
   // create the view box, so we don't lose stuff
   // off the screen
-  var fixDef = new b2FixtureDef;
-  fixDef.density = 1.0;
-  fixDef.friction = 0.5;
-  fixDef.restitution = 0.2;
-  var bodyDef = new b2BodyDef;
-  bodyDef.type = b2Body.b2_staticBody;
-  fixDef.shape = new b2PolygonShape;
-  fixDef.shape.SetAsBox(20, 2);
-  bodyDef.position.Set(10, 400 / 30 + 1.8);
-  world.CreateBody(bodyDef).CreateFixture(fixDef);
-  bodyDef.position.Set(10, -1.8);
-  world.CreateBody(bodyDef).CreateFixture(fixDef);
-  fixDef.shape.SetAsBox(2, 14);
-  bodyDef.position.Set(-1.8, 13);
-  world.CreateBody(bodyDef).CreateFixture(fixDef);
-  bodyDef.position.Set(21.8, 13);
-  world.CreateBody(bodyDef).CreateFixture(fixDef);
+  // var fixDef = new b2FixtureDef;
+  // fixDef.density = 1.0;
+  // fixDef.friction = 0.5;
+  // fixDef.restitution = 0.2;
+  // var bodyDef = new b2BodyDef;
+  // bodyDef.type = b2Body.b2_staticBody;
+  // fixDef.shape = new b2PolygonShape;
+  // fixDef.shape.SetAsBox(20, 2);
+  // bodyDef.position.Set(10, 400 / 30 + 1.8);
+  // world.CreateBody(bodyDef).CreateFixture(fixDef);
+  // bodyDef.position.Set(10, -1.8);
+  // world.CreateBody(bodyDef).CreateFixture(fixDef);
+  // fixDef.shape.SetAsBox(2, 14);
+  // bodyDef.position.Set(-1.8, 13);
+  // world.CreateBody(bodyDef).CreateFixture(fixDef);
+  // bodyDef.position.Set(21.8, 13);
+  // world.CreateBody(bodyDef).CreateFixture(fixDef);
 
 }
 
@@ -194,7 +194,7 @@ void createJoint(a, b, d){
   joint = new b2DistanceJointDef();
   joint.Initialize(a, b, a.GetWorldCenter(), b.GetWorldCenter());
   joint.dampingRatio = d;
-  joint.frequencyHz = 1.0;
+  joint.frequencyHz = 2.0;
   return world.CreateJoint(joint);
 }
 void createNode(x, y, r){
@@ -223,27 +223,31 @@ class Body{
   b2Body head;
   b2MouseJoint mouseJoint;
   float p1, p2;
+  float goalPhase, goalPhase2;
   color c;
+  float headMass;
   Body(numSegments, x, y, w, h){
     seg = new BodySegment[numSegments];
     for (var i = 0; i < seg.length; i++) {
-        seg[i] = new BodySegment((x+10)/ratio, (y+i*(h*1.3))/ratio, w/ratio, h/ratio, (numSegments-i)/numSegments*12+1);
+        seg[i] = new BodySegment((x+10)/ratio, (y+i*(h*1.3))/ratio, w/ratio, h/ratio, (numSegments-i)/numSegments*9+14);
       // connect the body segments
       if(i>0){
-        createJoint(seg[i].ne, seg[i-1].se, 0.002)
-        createJoint(seg[i].nw, seg[i-1].sw, 0.002);
+        createJoint(seg[i].ne, seg[i-1].se, 0.9)
+        createJoint(seg[i].nw, seg[i-1].sw, 0.9);
         // // and crossbars
         createJoint(seg[i].ne, seg[i-1].sw, 0.9);
-        // createJoint(seg[i].nw, seg[i-1].se, 0.9);
+        createJoint(seg[i].nw, seg[i-1].se, 0.9);
       }
     };
     // create a head
-    head = createNode((x+10)/ratio, (y-1*30)/ratio, 13);
+    head = createNode((x+10)/ratio, (y-1*30)/ratio, random(10, 30));
     // attach the head
     createJoint(seg[0].ne, head, 0.9);
     createJoint(seg[0].nw, head, 0.9);
     p1 = 100 + (random()*2-1) * 50;
-    p2 = 1000 + (random()*2-1) * 500;
+    p2 = random(20000, 25000);
+    goalPhase = random(20000);
+    goalPhase2 = random(20000);
     colorMode(HSB, 100);
     c = color(Math.random()*100, 100, 50);
   }
@@ -253,32 +257,35 @@ class Body{
     //   seg[i].draw();
     // };
     // draw as a tape
-    fill(c);
     noStroke();
     for (var i = seg.length - 1; i >= 0; i--) {
+      //console.log((seg.length-i)/seg.length*255);
       beginShape();
+      b = color((seg.length-i)/seg.length*255, (seg.length-i)/seg.length*255, (seg.length-i)/seg.length*255);
+      fill(blendColor(c, b, SOFT_LIGHT));
       vertex(seg[i].ne.GetWorldCenter().x*ratio, seg[i].ne.GetWorldCenter().y*ratio);
       vertex(seg[i].se.GetWorldCenter().x*ratio, seg[i].se.GetWorldCenter().y*ratio);
       vertex(seg[i].sw.GetWorldCenter().x*ratio, seg[i].sw.GetWorldCenter().y*ratio);
       vertex(seg[i].nw.GetWorldCenter().x*ratio, seg[i].nw.GetWorldCenter().y*ratio);
       endShape();
     };
+
     // calculate a vector to the center of the screen from the head
-    worldCenter = new b2Vec2(300/ratio, 200/ratio); // TODO: I should stop hard coding this at some point
+    target = new b2Vec2((noise(millis()/p2+goalPhase)*width)/ratio, (noise(millis()/p2+goalPhase2)*height)/ratio); // TODO: I should stop hard coding this at some point
+    ellipse(target.x*ratio, target.y*ratio, 10, 10)
     headCenter = head.GetWorldCenter();
-
-    worldCenter.Subtract(headCenter);
-    worldCenter.Normalize();
-    worldCenter.Multiply((sin(millis()/p1)*5)+5);
+    target.Subtract(headCenter);
+    target.Normalize();
+    target.Multiply(((sin(millis()/p1))+1)*10);
     // apply a force to the head
-    head.ApplyForce(worldCenter, head.GetWorldCenter())
-
+    head.ApplyForce(target, head.GetWorldCenter())
+    // head.SetPosition(target, head.GetWorldCenter());
   }
 }
 
 </script>
 <canvas width="200" height="200"></canvas>
-<canvas id="canvas" width="600" height="400" style="background-color:#333333;" ></canvas>
+<canvas id="canvas" width="800" height="800" style="background-color:#333333;" ></canvas>
 <div style="height:0px;width:0px;overflow:hidden;"></div>
 
 </body>
