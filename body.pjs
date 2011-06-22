@@ -1,0 +1,99 @@
+class Body{
+  BodySegment[] seg;
+  b2Body head;
+  b2MouseJoint mouseJoint;
+  float p1, p2;
+  float goalPhase, goalPhase2;
+  color c;
+  float headMass;
+  Body(numSegments, x, y, w, h){
+    seg = new BodySegment[numSegments];
+    for (var i = 0; i < seg.length; i++) {
+        seg[i] = new BodySegment((x+10)/ratio, (y+i*(h*1.3))/ratio, w/ratio, h/ratio, (numSegments-i)/numSegments*9+14);
+      // connect the body segments
+      if(i>0){
+        createJoint(seg[i].ne, seg[i-1].se, 0.9)
+        createJoint(seg[i].nw, seg[i-1].sw, 0.9);
+        // // and crossbars
+        createJoint(seg[i].ne, seg[i-1].sw, 0.9);
+        createJoint(seg[i].nw, seg[i-1].se, 0.9);
+      }
+    };
+    // create a head
+    head = createNode((x+10)/ratio, (y-1*30)/ratio, random(10, 30));
+    // attach the head
+    createJoint(seg[0].ne, head, 0.9);
+    createJoint(seg[0].nw, head, 0.9);
+    p1 = 100 + (random()*2-1) * 50;
+    p2 = random(20000, 25000);
+    goalPhase = random(20000);
+    goalPhase2 = random(20000);
+    colorMode(HSB, 100);
+    c = color(Math.random()*100, 100, 50);
+  }
+
+  void draw(){
+    // for (var i = seg.length - 1; i >= 0; i--) {
+    //   seg[i].draw();
+    // };
+    // draw as a tape
+    noStroke();
+    for (var i = seg.length - 1; i >= 0; i--) {
+      //console.log((seg.length-i)/seg.length*255);
+      beginShape();
+      b = color((seg.length-i)/seg.length*255, (seg.length-i)/seg.length*255, (seg.length-i)/seg.length*255);
+      fill(blendColor(c, b, SOFT_LIGHT));
+      vertex(seg[i].ne.GetWorldCenter().x*ratio, seg[i].ne.GetWorldCenter().y*ratio);
+      vertex(seg[i].se.GetWorldCenter().x*ratio, seg[i].se.GetWorldCenter().y*ratio);
+      vertex(seg[i].sw.GetWorldCenter().x*ratio, seg[i].sw.GetWorldCenter().y*ratio);
+      vertex(seg[i].nw.GetWorldCenter().x*ratio, seg[i].nw.GetWorldCenter().y*ratio);
+      endShape();
+    };
+
+    // calculate a vector to the center of the screen from the head
+    target = new b2Vec2((noise(millis()/p2+goalPhase)*width)/ratio, (noise(millis()/p2+goalPhase2)*height)/ratio); // TODO: I should stop hard coding this at some point
+    ellipse(target.x*ratio, target.y*ratio, 10, 10)
+    headCenter = head.GetWorldCenter();
+    target.Subtract(headCenter);
+    target.Normalize();
+    target.Multiply(((sin(millis()/p1))+1)*10);
+    // apply a force to the head
+    head.ApplyForce(target, head.GetWorldCenter())
+    // head.SetPosition(target, head.GetWorldCenter());
+  }
+}
+
+// apparently the preprocessor is a little bit wierd, but we should be able to do this type of thing
+class BodySegment{
+  float x, y, w, h;
+  b2Body ne, se, sw, nw;
+  b2DistanceJoint n, s, e, west;
+
+  BodySegment(float _x, float _y, float _w, float _h, r){
+    x = _x;
+    y = _y;
+    w = _w;
+    h = _h;
+    ne = createNode(x+w/2, y-h/2, r);
+    nw = createNode(x-w/2, y-h/2, r);
+    se = createNode(x+w/2, y+h/2, r);
+    sw = createNode(x-w/2, y+h/2, r);
+    // set up all the distance joints that will keep the segments apart
+    //n
+    sideDamp = 0.03;
+    n     = createJoint(ne, nw, sideDamp);
+    e     = createJoint(ne, se, sideDamp);
+    s     = createJoint(sw, se, sideDamp);
+    west  = createJoint(sw, nw, sideDamp);
+    console.log(west.GetDampingRatio());
+    // create the cross joints
+    createJoint(ne, sw, 0.005);
+    createJoint(nw, se, 0.005);
+  }
+  void draw(){
+    drawShape(ne.shape, ne);
+    drawShape(nw.shape, nw);
+    drawShape(se.shape, se);
+    drawShape(sw.shape, sw);
+  }
+}

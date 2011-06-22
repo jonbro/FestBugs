@@ -1,292 +1,68 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <script src="processing.js"></script>
-  <script src="traer.physics.js"></script>
-  <script src="Box2dWeb-2.1.a.3.js"></script>
-  <script src="init.js"></script>
-<link rel="stylesheet" href="style.css"/></head>
+  <script src="jquery-1.6.1.min.js"></script>
+  <link rel="stylesheet" href="style.css"/></head>
 <body>
-<script type="application/processing">
+<script type="text/javascript">
+  // lets load all the processing stuff over ajax and execute it once it has all been loaded
+  var toLoad = ["processing.js", "Box2dWeb-2.1.a.3.js", "body.pjs", "pjs_chars.pjs"];
+  $(document).ready(function(){
+    // wait for the canvas to load before kicking off the ajax stuff
+    $(window).load(function(){
+      var loadCount = 0;
+      var toExecute = new Array();
 
-ParticleSystem physics;
-
-Particle p;
-Spring s;
-Body[] bodies;
-var b2Vec2 = Box2D.Common.Math.b2Vec2
-  , b2AABB = Box2D.Collision.b2AABB
-  , b2BodyDef = Box2D.Dynamics.b2BodyDef
-  , b2Body = Box2D.Dynamics.b2Body
-  , b2Shape = Box2D.Collision.Shapes.b2Shape
-  , b2FixtureDef = Box2D.Dynamics.b2FixtureDef
-  , b2Fixture = Box2D.Dynamics.b2Fixture
-  , b2World = Box2D.Dynamics.b2World
-  , b2MassData = Box2D.Collision.Shapes.b2MassData
-  , b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape
-  , b2CircleShape = Box2D.Collision.Shapes.b2CircleShape
-  , b2DebugDraw = Box2D.Dynamics.b2DebugDraw
-  , b2MouseJointDef =  Box2D.Dynamics.Joints.b2MouseJointDef
-  , b2DistanceJointDef =  Box2D.Dynamics.Joints.b2DistanceJointDef
-  , b2Math = Box2D.Common.Math.b2Math
-  ;
-
-var world = new b2World(
-     new b2Vec2(0, 0)    //gravity
-  ,  true                 //allow sleep
-);
-var selectedBody, mouseJoint;
-var ratio = 30; // for converting box2d units to display and vice versa
-var doSleep = true;
-var timeStep = 1.0/30;
-var iteration = 12;
-         var debugDraw = new b2DebugDraw();
-      debugDraw.SetSprite(document.getElementById("canvas").getContext("2d"));
-      debugDraw.SetDrawScale(30.0);
-      debugDraw.SetFillAlpha(0.5);
-      debugDraw.SetLineThickness(1.0);
-      debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
-      world.SetDebugDraw(debugDraw);
-
-void setup()
-{
-  size( 800, 800 );
-  smooth();
-  fill( 0 );
-  ellipseMode( CENTER );
-
-  bodies = new Body[3];
-  for (var i = 0; i < bodies.length; i++) {
-    bodies[i] = new Body(Math.ceil(Math.random()*5)+2, Math.random()*500, Math.random()*400, Math.random()*40+20, Math.random()*40+20);
-    console.log(bodies.length);
-  };
-
-  // create the view box, so we don't lose stuff
-  // off the screen
-  // var fixDef = new b2FixtureDef;
-  // fixDef.density = 1.0;
-  // fixDef.friction = 0.5;
-  // fixDef.restitution = 0.2;
-  // var bodyDef = new b2BodyDef;
-  // bodyDef.type = b2Body.b2_staticBody;
-  // fixDef.shape = new b2PolygonShape;
-  // fixDef.shape.SetAsBox(20, 2);
-  // bodyDef.position.Set(10, 400 / 30 + 1.8);
-  // world.CreateBody(bodyDef).CreateFixture(fixDef);
-  // bodyDef.position.Set(10, -1.8);
-  // world.CreateBody(bodyDef).CreateFixture(fixDef);
-  // fixDef.shape.SetAsBox(2, 14);
-  // bodyDef.position.Set(-1.8, 13);
-  // world.CreateBody(bodyDef).CreateFixture(fixDef);
-  // bodyDef.position.Set(21.8, 13);
-  // world.CreateBody(bodyDef).CreateFixture(fixDef);
-
-}
-
-void mousePressed()
-{
-}
-
-void mouseDragged()
-{
-}
-
-void mouseReleased()
-{
-}
-
-void draw()
-{
-  colorMode(RGB, 255)
-  background(255);
-  for (var i = 0; i < bodies.length; i++) {
-    bodies[i].draw();
-  };
-  update();
-  world.Step(1 / 60, 10, 10);
-  world.DrawDebugData();
-  world.ClearForces();
-}
-b2Body getBodyAtMouse() {
-  mousePVec = new b2Vec2(mouseX/30, mouseY/30);
-  var aabb = new b2AABB();
-  aabb.lowerBound.Set(mouseX/30 - 0.001, mouseY/30 - 0.001);
-  aabb.upperBound.Set(mouseX/30 + 0.001, mouseY/30 + 0.001);
-  
-  // Query the world for overlapping shapes.
-  //console.log(mouseX/30, mouseY/30, aabb)
-  selectedBody = null;
-  world.QueryAABB(function(fixture) {
-    console.log(fixture);
-    if(fixture.GetBody().GetType() != b2Body.b2_staticBody) {
-       if(fixture.GetShape().TestPoint(fixture.GetBody().GetTransform(), mousePVec)) {
-          selectedBody = fixture.GetBody();
-          return false;
-       }
-    }
-    return true;
-  }, aabb);
-  return selectedBody;
-}
-
-
-void update() {
-
-
-};
-
-
-void drawShape(shape,body) {
-  switch(shape.m_type){
-    case b2Shape.e_circleShape:
-      var center = b2Math.MulX(body.m_xf, shape.m_p);
-      var radius = shape.m_radius;
-      ellipse(center.x*ratio, center.y*ratio, radius*ratio*2, radius*ratio*2);
-    case b2Shape.e_polygonShape:
-      poly = shape;
-      // console.log(shape.GetType())
-      beginShape();
-      for (var i = 0; i < poly.m_vertexCount; i++) {
-        b2Vec2 v = b2Math.MulMV(body.GetTransform().R, poly.GetVertices()[i]);
-        v = b2Math.AddVV(v, body.GetWorldCenter());
-        vertex(v.x*ratio, v.y*ratio);
+      // this gets kicked off after all the files have been loaded
+      var downloadComplete = function(){
+        loadCount++;
+        if (loadCount >= toLoad.length){
+          var processingCode = "";
+          // concat all of the processing code together
+          $.each(toExecute, function(i, v){
+            if(v){
+              processingCode += v;
+            }
+          });
+          // setup the processing context with the source code
+          // console.log(document.getElementById("processing-canvas").getContext
+          // console.log($("#processing-canvas").get(0).getContext());
+          console.log($("canvas").get(0));
+          console.log(processingCode);
+          var test = new Processing(document.getElementById("processing-canvas"), processingCode);
+        }
       }
-      endShape();
-      break;
-  }
-}
+      // fire off a whole pile of loads
+      $.each(toLoad, function(i, v){
+        // split the file name on the ending
+        var end = v.split(".");
+        end = end[end.length-1];
 
-// apparently the preprocessor is a little bit wierd, but we should be able to do this type of thing
-class BodySegment{
-  float x, y, w, h;
-  b2Body ne, se, sw, nw;
-  b2DistanceJoint n, s, e, west;
-
-  BodySegment(float _x, float _y, float _w, float _h, r){
-    x = _x;
-    y = _y;
-    w = _w;
-    h = _h;
-    ne = createNode(x+w/2, y-h/2, r);
-    nw = createNode(x-w/2, y-h/2, r);
-    se = createNode(x+w/2, y+h/2, r);
-    sw = createNode(x-w/2, y+h/2, r);
-    // set up all the distance joints that will keep the segments apart
-    //n
-    sideDamp = 0.03;
-    n     = createJoint(ne, nw, sideDamp);
-    e     = createJoint(ne, se, sideDamp);
-    s     = createJoint(sw, se, sideDamp);
-    west  = createJoint(sw, nw, sideDamp);
-    console.log(west.GetDampingRatio());
-    // create the cross joints
-    createJoint(ne, sw, 0.005);
-    createJoint(nw, se, 0.005);
-  }
-  void draw(){
-    drawShape(ne.shape, ne);
-    drawShape(nw.shape, nw);
-    drawShape(se.shape, se);
-    drawShape(sw.shape, sw);
-  }
-}
-void createJoint(a, b, d){
-  joint = new b2DistanceJointDef();
-  joint.Initialize(a, b, a.GetWorldCenter(), b.GetWorldCenter());
-  joint.dampingRatio = d;
-  joint.frequencyHz = 2.0;
-  return world.CreateJoint(joint);
-}
-void createNode(x, y, r){
-  fixDef = new b2FixtureDef();
-  fixDef.density = 1.0;
-  fixDef.friction = 0.5;
-  fixDef.restitution = 0.2;
-  fixDef.filter.groupIndex = -8;
-  // the shape definition
-  fixDef.shape = new b2CircleShape(
-    r/2/ratio //radius
-  );
-  // the body definition
-  bodyDef = new b2BodyDef();
-  bodyDef.type = b2Body.b2_dynamicBody;
-  bodyDef.position.Set(x,y);
-  // the body in the world, I don't know the diff between this and the main body def
-  body = world.CreateBody(bodyDef);
-  body.CreateFixture(fixDef);
-  body.shape = fixDef.shape;
-  return body;
-}
-
-class Body{
-  BodySegment[] seg;
-  b2Body head;
-  b2MouseJoint mouseJoint;
-  float p1, p2;
-  float goalPhase, goalPhase2;
-  color c;
-  float headMass;
-  Body(numSegments, x, y, w, h){
-    seg = new BodySegment[numSegments];
-    for (var i = 0; i < seg.length; i++) {
-        seg[i] = new BodySegment((x+10)/ratio, (y+i*(h*1.3))/ratio, w/ratio, h/ratio, (numSegments-i)/numSegments*9+14);
-      // connect the body segments
-      if(i>0){
-        createJoint(seg[i].ne, seg[i-1].se, 0.9)
-        createJoint(seg[i].nw, seg[i-1].sw, 0.9);
-        // // and crossbars
-        createJoint(seg[i].ne, seg[i-1].sw, 0.9);
-        createJoint(seg[i].nw, seg[i-1].se, 0.9);
-      }
-    };
-    // create a head
-    head = createNode((x+10)/ratio, (y-1*30)/ratio, random(10, 30));
-    // attach the head
-    createJoint(seg[0].ne, head, 0.9);
-    createJoint(seg[0].nw, head, 0.9);
-    p1 = 100 + (random()*2-1) * 50;
-    p2 = random(20000, 25000);
-    goalPhase = random(20000);
-    goalPhase2 = random(20000);
-    colorMode(HSB, 100);
-    c = color(Math.random()*100, 100, 50);
-  }
-
-  void draw(){
-    // for (var i = seg.length - 1; i >= 0; i--) {
-    //   seg[i].draw();
-    // };
-    // draw as a tape
-    noStroke();
-    for (var i = seg.length - 1; i >= 0; i--) {
-      //console.log((seg.length-i)/seg.length*255);
-      beginShape();
-      b = color((seg.length-i)/seg.length*255, (seg.length-i)/seg.length*255, (seg.length-i)/seg.length*255);
-      fill(blendColor(c, b, SOFT_LIGHT));
-      vertex(seg[i].ne.GetWorldCenter().x*ratio, seg[i].ne.GetWorldCenter().y*ratio);
-      vertex(seg[i].se.GetWorldCenter().x*ratio, seg[i].se.GetWorldCenter().y*ratio);
-      vertex(seg[i].sw.GetWorldCenter().x*ratio, seg[i].sw.GetWorldCenter().y*ratio);
-      vertex(seg[i].nw.GetWorldCenter().x*ratio, seg[i].nw.GetWorldCenter().y*ratio);
-      endShape();
-    };
-
-    // calculate a vector to the center of the screen from the head
-    target = new b2Vec2((noise(millis()/p2+goalPhase)*width)/ratio, (noise(millis()/p2+goalPhase2)*height)/ratio); // TODO: I should stop hard coding this at some point
-    ellipse(target.x*ratio, target.y*ratio, 10, 10)
-    headCenter = head.GetWorldCenter();
-    target.Subtract(headCenter);
-    target.Normalize();
-    target.Multiply(((sin(millis()/p1))+1)*10);
-    // apply a force to the head
-    head.ApplyForce(target, head.GetWorldCenter())
-    // head.SetPosition(target, head.GetWorldCenter());
-  }
-}
-
+        // javascript files don't matter the order
+        // so we will execute them as they come in
+        if(end == "js"){
+          $.ajax({
+            url: v,
+            dataType: 'script',
+            success: function(data){
+              downloadComplete();
+            }
+          });
+        }else if(end == "pjs"){
+          $.ajax({
+            url: v,
+            dataType: 'text',
+            success: function(data){
+              toExecute[i] = data;
+              downloadComplete();
+            }
+          });
+        }
+      });      
+    });
+  });
 </script>
-<canvas width="200" height="200"></canvas>
-<canvas id="canvas" width="800" height="800" style="background-color:#333333;" ></canvas>
-<div style="height:0px;width:0px;overflow:hidden;"></div>
-
+  <canvas id="processing-canvas"></canvas>
+  <canvas id="debug" width="800" height="800"></canvas>
 </body>
 </html>
