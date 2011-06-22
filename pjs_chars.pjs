@@ -17,6 +17,7 @@ var b2Vec2 = Box2D.Common.Math.b2Vec2
   , b2DebugDraw = Box2D.Dynamics.b2DebugDraw
   , b2MouseJointDef =  Box2D.Dynamics.Joints.b2MouseJointDef
   , b2DistanceJointDef =  Box2D.Dynamics.Joints.b2DistanceJointDef
+  , b2RevoluteJointDef =  Box2D.Dynamics.Joints.b2RevoluteJointDef
   , b2Math = Box2D.Common.Math.b2Math
   ;
 
@@ -44,7 +45,7 @@ void setup()
   fill( 0 );
   ellipseMode( CENTER );
 
-  bodies = new Body[5];
+  bodies = new Body[1];
   for (var i = 0; i < bodies.length; i++) {
     bodies[i] = new Body(Math.ceil(Math.random()*5)+2, Math.random()*500, Math.random()*400, Math.random()*40+20, Math.random()*40+20);
   };
@@ -116,6 +117,17 @@ void createJoint(a, b, d){
   joint.Initialize(a, b, a.GetWorldCenter(), b.GetWorldCenter());
   joint.dampingRatio = d;
   joint.frequencyHz = 2.0;
+  return world.CreateJoint(joint);
+}
+void createRevJoint(a, b){
+  joint = new b2RevoluteJointDef();
+  joint.Initialize(a, b, a.GetWorldCenter());
+  joint.enableLimit = true;
+  joint.upperAngle = 0.25 * PI;
+  joint.lowerAngle = -0.25 * PI;
+  joint.maxMotorTorque = 5;
+  joint.motorSpeed = 0;
+  joint.enableMotor = true;
   return world.CreateJoint(joint);
 }
 void createNode(x, y, r){

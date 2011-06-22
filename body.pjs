@@ -6,6 +6,7 @@ class Body{
   float goalPhase, goalPhase2;
   color c;
   float headMass;
+  b2Body[] eyes;
   Body(numSegments, x, y, w, h){
     seg = new BodySegment[numSegments];
     for (var i = 0; i < seg.length; i++) {
@@ -22,8 +23,26 @@ class Body{
     // create a head
     head = createNode((x+10)/ratio, (y-1*30)/ratio, random(10, 30));
     // attach the head
-    createJoint(seg[0].ne, head, 0.9);
-    createJoint(seg[0].nw, head, 0.9);
+    createRevJoint(seg[0].ne, head);
+    createRevJoint(seg[0].nw, head);
+
+    // create a bunch of eyes
+    eyeCount = Math.floor(random(2, 7));
+    eyes = new b2Body[eyeCount];
+    // the eyes loop through 180 degrees adding an eye at equal intervals around the head
+    for (var i = 0; i < eyeCount; i++) {
+      var angle = (180 * i/eyeCount)-180+(1/eyeCount*180/2);
+      pos = new b2Vec2(cos(radians(angle)), sin(radians(angle)));
+      pos.Normalize();
+      // expand the eyes out a bit from the head
+      pos.Multiply(30/ratio);
+      pos.Add(head.GetWorldCenter());
+      // create the eye
+      eyes[i] = createNode(pos.x, pos.y, 15);
+      // attach the eye to the head
+      createRevJoint(head, eyes[i], 0.9)
+    };
+
     p1 = 100 + (random()*2-1) * 50;
     p2 = random(20000, 25000);
     goalPhase = random(20000);
@@ -49,7 +68,14 @@ class Body{
       vertex(seg[i].nw.GetWorldCenter().x*ratio, seg[i].nw.GetWorldCenter().y*ratio);
       endShape();
     };
-
+    // draw the eyes
+    for (var i = 0; i < eyes.length; i++) {
+      eyeCenter = eyes[i].GetWorldCenter()
+      fill(255);
+      ellipse(eyeCenter.x*ratio, eyeCenter.y*ratio, 25, 25);
+      fill(0);
+      ellipse(eyeCenter.x*ratio, eyeCenter.y*ratio, 10, 10);
+    };      
     // calculate a vector to the center of the screen from the head
     target = new b2Vec2((noise(millis()/p2+goalPhase)*width)/ratio, (noise(millis()/p2+goalPhase2)*height)/ratio); // TODO: I should stop hard coding this at some point
     ellipse(target.x*ratio, target.y*ratio, 10, 10)
@@ -85,7 +111,6 @@ class BodySegment{
     e     = createJoint(ne, se, sideDamp);
     s     = createJoint(sw, se, sideDamp);
     west  = createJoint(sw, nw, sideDamp);
-    console.log(west.GetDampingRatio());
     // create the cross joints
     createJoint(ne, sw, 0.005);
     createJoint(nw, se, 0.005);
