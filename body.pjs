@@ -7,17 +7,19 @@ class Body{
   color c;
   float headMass;
   b2Body[] eyes;
+  b2RevoluteJoint[] armJoints;
+  b2Body[] hands;
   Body(numSegments, x, y, w, h){
     seg = new BodySegment[numSegments];
     for (var i = 0; i < seg.length; i++) {
-        seg[i] = new BodySegment((x+10)/ratio, (y+i*(h*1.3))/ratio, w/ratio, h/ratio, (numSegments-i)/numSegments*9+14);
+        seg[i] = new BodySegment((x+10)/ratio, (y+i*(h*1.3))/ratio, (numSegments-i)/numSegments*w/ratio, h/ratio, (numSegments-i)/numSegments*14+7);
       // connect the body segments
       if(i>0){
-        createJoint(seg[i].ne, seg[i-1].se, 0.9)
-        createJoint(seg[i].nw, seg[i-1].sw, 0.9);
+        createJoint(seg[i].ne, seg[i-1].se, 1, 20)
+        createJoint(seg[i].nw, seg[i-1].sw, 1, 20);
         // // and crossbars
-        createJoint(seg[i].ne, seg[i-1].sw, 0.9);
-        createJoint(seg[i].nw, seg[i-1].se, 0.9);
+        createJoint(seg[i].ne, seg[i-1].sw, 0.9, 10);
+        createJoint(seg[i].nw, seg[i-1].se, 0.9, 10);
       }
     };
     // create a head
@@ -38,10 +40,39 @@ class Body{
       pos.Multiply(30/ratio);
       pos.Add(head.GetWorldCenter());
       // create the eye
-      eyes[i] = createNode(pos.x, pos.y, 15);
+      eyes[i] = createNode(pos.x, pos.y, 5);
       // attach the eye to the head
       createRevJoint(head, eyes[i], 0.9)
     };
+    // add some simple arms
+    armJoints = new b2RevoluteJoint[2];
+    hands = new b2Body[2];
+    // left arm
+    // add the shoulder node
+    lArmCenter = new b2Vec2(seg[1].nw.GetWorldCenter().x, seg[1].nw.GetWorldCenter().y);
+    lArmCenter.x -= 10/ratio;
+    lArm = createNode(lArmCenter.x, lArmCenter.y, 15);
+    createRevJoint(seg[1].nw, lArm);
+    createRevJoint(seg[0].sw, lArm);
+    // add the arm node
+    lArmCenter.x -= 30/ratio;
+    hands[0] = createNode(lArmCenter.x, lArmCenter.y, 5);
+    armJoints[0] = createRevJoint(lArm, hands[0]);
+
+    // right arm
+    // add the shoulder node
+    rArmCenter = new b2Vec2(seg[1].ne.GetWorldCenter().x, seg[1].ne.GetWorldCenter().y);
+    rArmCenter.x += 10/ratio;
+    rArm = createNode(rArmCenter.x, rArmCenter.y, 15);
+    createRevJoint(seg[1].ne, rArm);
+    createRevJoint(seg[0].se, rArm);
+    // add the arm node
+    rArmCenter.x += 30/ratio;
+    hands[1] = createNode(rArmCenter.x, rArmCenter.y, 5);
+    armJoints[1] = createRevJoint(rArm, hands[1]);
+
+
+
 
     p1 = 100 + (random()*2-1) * 50;
     p2 = random(20000, 25000);
@@ -69,15 +100,16 @@ class Body{
       endShape();
     };
     // draw the eyes
-    for (var i = 0; i < eyes.length; i++) {
-      eyeCenter = eyes[i].GetWorldCenter()
-      fill(255);
-      ellipse(eyeCenter.x*ratio, eyeCenter.y*ratio, 25, 25);
-      fill(0);
-      ellipse(eyeCenter.x*ratio, eyeCenter.y*ratio, 10, 10);
-    };      
+      for (var i = 0; i < eyes.length; i++) {
+        eyeCenter = eyes[i].GetWorldCenter()
+        fill(c);
+        ellipse(eyeCenter.x*ratio, eyeCenter.y*ratio, 25, 25);
+        fill(255);
+        ellipse(eyeCenter.x*ratio, eyeCenter.y*ratio, 10, 10);
+      };      
     // calculate a vector to the center of the screen from the head
     target = new b2Vec2((noise(millis()/p2+goalPhase)*width)/ratio, (noise(millis()/p2+goalPhase2)*height)/ratio); // TODO: I should stop hard coding this at some point
+    fill(c);
     ellipse(target.x*ratio, target.y*ratio, 10, 10)
     headCenter = head.GetWorldCenter();
     target.Subtract(headCenter);
@@ -86,6 +118,16 @@ class Body{
     // apply a force to the head
     head.ApplyForce(target, head.GetWorldCenter())
     // head.SetPosition(target, head.GetWorldCenter());
+
+    // jam out on the arm
+    armJoints[0].SetMotorSpeed(cos(millis()/1000));
+    armJoints[1].SetMotorSpeed(-1*cos(millis()/1000));
+    // draw the hands
+    for (var i = 0; i < hands.length; i++) {
+      center = hands[i].GetWorldCenter();
+      fill(blendColor(c, color(255), SOFT_LIGHT));
+      ellipse(center.x*ratio, center.y*ratio, 20, 20);
+    };
   }
 }
 
@@ -107,13 +149,13 @@ class BodySegment{
     // set up all the distance joints that will keep the segments apart
     //n
     sideDamp = 0.03;
-    n     = createJoint(ne, nw, sideDamp);
-    e     = createJoint(ne, se, sideDamp);
-    s     = createJoint(sw, se, sideDamp);
-    west  = createJoint(sw, nw, sideDamp);
+    n     = createJoint(ne, nw, sideDamp, 4);
+    e     = createJoint(ne, se, sideDamp, 4);
+    s     = createJoint(sw, se, sideDamp, 4);
+    west  = createJoint(sw, nw, sideDamp, 4);
     // create the cross joints
-    createJoint(ne, sw, 0.005);
-    createJoint(nw, se, 0.005);
+    createRevJoint(ne, sw);
+    createRevJoint(nw, se);
   }
   void draw(){
     drawShape(ne.shape, ne);

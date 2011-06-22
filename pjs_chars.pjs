@@ -45,9 +45,9 @@ void setup()
   fill( 0 );
   ellipseMode( CENTER );
 
-  bodies = new Body[1];
+  bodies = new Body[3];
   for (var i = 0; i < bodies.length; i++) {
-    bodies[i] = new Body(Math.ceil(Math.random()*5)+2, Math.random()*500, Math.random()*400, Math.random()*40+20, Math.random()*40+20);
+    bodies[i] = new Body(Math.ceil(random(2,10)), Math.random()*500, Math.random()*400, Math.random()*40+10, Math.random()*40+10);
   };
 
 }
@@ -112,11 +112,11 @@ void drawShape(shape,body) {
       break;
   }
 }
-void createJoint(a, b, d){
+void createJoint(a, b, d, f){
   joint = new b2DistanceJointDef();
   joint.Initialize(a, b, a.GetWorldCenter(), b.GetWorldCenter());
   joint.dampingRatio = d;
-  joint.frequencyHz = 2.0;
+  joint.frequencyHz = 2;
   return world.CreateJoint(joint);
 }
 void createRevJoint(a, b){
