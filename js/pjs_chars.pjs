@@ -40,7 +40,7 @@ var iteration = 12;
 
 void setup()
 {
-  size( 800, 800 );
+  size( 640, 800 );
   smooth();
   fill( 0 );
   ellipseMode( CENTER );

@@ -3,73 +3,14 @@
 <head>
 	<meta charset="utf-8" />
 	<title>FESTBUGS</title>
-	<link rel="stylesheet" type="text/css" href="css/style.css" />
 	<!--[if IE]>
 		<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
 	<link href='http://fonts.googleapis.com/css?family=Pacifico&v1' rel='stylesheet' type='text/css'>
-	<style>
-		/* http://www.colourlovers.com/palette/452030/you_will_be_free */
-		html, body{
-			height: 100%;
-		}
-		body{
-			background: #bad3d8; /* Old browsers */
-background: -moz-linear-gradient(top, #bad3d8 0%, #dce8eb 100%); /* FF3.6+ */
-background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#bad3d8), color-stop(100%,#dce8eb)); /* Chrome,Safari4+ */
-background: -webkit-linear-gradient(top, #bad3d8 0%,#dce8eb 100%); /* Chrome10+,Safari5.1+ */
-background: -o-linear-gradient(top, #bad3d8 0%,#dce8eb 100%); /* Opera11.10+ */
-background: -ms-linear-gradient(top, #bad3d8 0%,#dce8eb 100%); /* IE10+ */
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#bad3d8', endColorstr='#dce8eb',GradientType=0 ); /* IE6-9 */
-background: linear-gradient(top, #bad3d8 0%,#dce8eb 100%); /* W3C */
-		}
-		#container{
-			width:960px;
-			background: #fff;
-			margin: auto;
-		}
-		#header{
-			padding:1em;
-			background: #ECF1F2;
-		}
-		h1 {
-			font-size: 3em;
-			font-family: 'Pacifico', arial, serif;
-			color: #CBDBE0;
-		}
-		#right_column{
-			width: 320px;
-			float: right;
-			background: #fff;
-		}
-		#event_list .event{
-			background: #dce8eb; /* Old browsers */
-			background: -moz-linear-gradient(top, #dce8eb 0%, #afcdd3 100%); /* FF3.6+ */
-			background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#dce8eb), color-stop(100%,#afcdd3)); /* Chrome,Safari4+ */
-			background: -webkit-linear-gradient(top, #dce8eb 0%,#afcdd3 100%); /* Chrome10+,Safari5.1+ */
-			background: -o-linear-gradient(top, #dce8eb 0%,#afcdd3 100%); /* Opera11.10+ */
-			background: -ms-linear-gradient(top, #dce8eb 0%,#afcdd3 100%); /* IE10+ */
-			filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#dce8eb', endColorstr='#afcdd3',GradientType=0 ); /* IE6-9 */
-			background: linear-gradient(top, #dce8eb 0%,#afcdd3 100%); /* W3C */
-			color: #577984;
-			text-shadow: 0px 1px 0px #fff;
-			padding: 0.7em 1em;
-			font-family: helvetica;
-			font-size: .9em;
-			border-bottom: 1px solid #94B0B5;
-			border-top: 1px solid #E0F7FC;
-		}
-		#event_list .event .name{
-			font-size: 1.2em;
-			padding-bottom: 0.4em;
-			font-weight: bold;
-		}
-		#event_list .event .date, #event_list .event .time{
-		}
-		#event_list .event .bold{
-			font-weight: bold;			
-		}
-	</style>
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
+
+	<script type="text/javascript" src="js/jquery-1.6.1.min.js"></script>	
+	<script type="text/javascript" src="js/init.js"></script>
 </head>
 <body id="home">
 	<div id="container">
@@ -77,6 +18,8 @@ background: linear-gradient(top, #bad3d8 0%,#dce8eb 100%); /* W3C */
 			<h1>FestBugs</h1>
 		</div>
 		<div id="left_column">
+		  <canvas id="processing-canvas"></canvas>
+		  <canvas id="debug" width="640" height="800"></canvas>
 		</div>
 		<div id="right_column">
 			<div id="event_list">

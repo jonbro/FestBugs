@@ -66,4 +66,73 @@ table{
 /*------------------------------------*\
   MAIN
 \*------------------------------------*/
-/* GO! */
+  /* GO! *//**/
+
+/* http://www.colourlovers.com/palette/452030/you_will_be_free */
+/* http://www.colorzilla.com/gradient-editor/ */
+/* http://www.reynoldsftw.com/2009/03/text-embossing-technique-with-css/ */
+html, body{
+  height: 100%;
+}
+body{
+  background: #bad3d8; /* Old browsers */
+  background: -moz-linear-gradient(top, #bad3d8 0%, #dce8eb 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#bad3d8), color-stop(100%,#dce8eb)); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, #bad3d8 0%,#dce8eb 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, #bad3d8 0%,#dce8eb 100%); /* Opera11.10+ */
+  background: -ms-linear-gradient(top, #bad3d8 0%,#dce8eb 100%); /* IE10+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#bad3d8', endColorstr='#dce8eb',GradientType=0 ); /* IE6-9 */
+  background: linear-gradient(top, #bad3d8 0%,#dce8eb 100%); /* W3C */
+}
+#container{
+  width:960px;
+  background: #fff;
+  margin: auto;
+  position: relative;
+}
+#header{
+  padding:1em;
+  background: #ECF1F2;
+}
+h1 {
+  font-size: 3em;
+  font-family: 'Pacifico', arial, serif;
+  color: #CBDBE0;
+}
+#left_column{
+  position: absolute;
+  top: 30px;
+  left: 0;
+}
+#right_column{
+  width: 320px;
+  float: right;
+  background: #fff;
+}
+#event_list .event{
+  background: #dce8eb; /* Old browsers */
+  background: -moz-linear-gradient(top, #dce8eb 0%, #afcdd3 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#dce8eb), color-stop(100%,#afcdd3)); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, #dce8eb 0%,#afcdd3 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, #dce8eb 0%,#afcdd3 100%); /* Opera11.10+ */
+  background: -ms-linear-gradient(top, #dce8eb 0%,#afcdd3 100%); /* IE10+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#dce8eb', endColorstr='#afcdd3',GradientType=0 ); /* IE6-9 */
+  background: linear-gradient(top, #dce8eb 0%,#afcdd3 100%); /* W3C */
+  color: #577984;
+  text-shadow: 0px 1px 0px #fff;
+  padding: 0.7em 1em;
+  font-family: helvetica;
+  font-size: .9em;
+  border-bottom: 1px solid #94B0B5;
+  border-top: 1px solid #E0F7FC;
+}
+#event_list .event .name{
+  font-size: 1.2em;
+  padding-bottom: 0.4em;
+  font-weight: bold;
+}
+#event_list .event .date, #event_list .event .time{
+}
+#event_list .event .bold{
+  font-weight: bold;      
+}
