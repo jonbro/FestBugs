@@ -9,6 +9,9 @@ class Body{
   b2Body[] eyes;
   b2RevoluteJoint[] armJoints;
   b2Body[] hands;
+  int note;
+  var noteTime;
+  var noteCounter;
   Body(numSegments, x, y, w, h){
     seg = new BodySegment[numSegments];
     for (var i = 0; i < seg.length; i++) {
@@ -80,18 +83,25 @@ class Body{
     goalPhase2 = random(20000);
     colorMode(HSB, 100);
     c = color(Math.random()*100, 100, 50);
+
+    // for the synthesizer
+    note = Math.floor(random(50, 80));
+    noteTime = random(10)*500;
+    noteCounter = noteTime;
+
   }
 
   void draw(){
     // for (var i = seg.length - 1; i >= 0; i--) {
     //   seg[i].draw();
     // };
+
     // draw as a tape
     noStroke();
     for (var i = seg.length - 1; i >= 0; i--) {
-      //console.log((seg.length-i)/seg.length*255);
       beginShape();
-      b = color((seg.length-i)/seg.length*255, (seg.length-i)/seg.length*255, (seg.length-i)/seg.length*255);
+      texture(spriteSheet);
+      b = color((seg.length-i)/seg.length*255*(noteCounter/noteTime), (seg.length-i)/seg.length*255*(noteCounter/noteTime), (seg.length-i)/seg.length*255*(noteCounter/noteTime));
       fill(blendColor(c, b, SOFT_LIGHT));
       vertex(seg[i].ne.GetWorldCenter().x*ratio, seg[i].ne.GetWorldCenter().y*ratio);
       vertex(seg[i].se.GetWorldCenter().x*ratio, seg[i].se.GetWorldCenter().y*ratio);
@@ -116,7 +126,7 @@ class Body{
     target.Normalize();
     target.Multiply(((sin(millis()/p1))+1)*10);
     // apply a force to the head
-    head.ApplyForce(target, head.GetWorldCenter())
+    // head.ApplyForce(target, head.GetWorldCenter())
     // head.SetPosition(target, head.GetWorldCenter());
 
     // jam out on the arm
@@ -128,6 +138,21 @@ class Body{
       fill(blendColor(c, color(255), SOFT_LIGHT));
       ellipse(center.x*ratio, center.y*ratio, 20, 20);
     };
+
+    // count for the next note
+    noteCounter -= ellapsed;
+    if(noteCounter < 0){
+      noteCounter += noteTime;
+      synth.queueNote(note);
+      target = new b2Vec2((noise(millis()/p2+goalPhase)*width)/ratio, (noise(millis()/p2+goalPhase2)*height)/ratio); // TODO: I should stop hard coding this at some point
+      headCenter = head.GetWorldCenter();
+      target.Subtract(headCenter);
+      target.Normalize();
+      target.Multiply(200);
+      // apply a force to the head
+      head.ApplyForce(target, head.GetWorldCenter())
+
+    }
   }
 }
 

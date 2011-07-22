@@ -1,3 +1,5 @@
+/* @pjs preload="img/sheet.png"; */
+
 ParticleSystem physics;
 
 Particle p;
@@ -25,6 +27,7 @@ var world = new b2World(
      new b2Vec2(0, 0)    //gravity
   ,  true                 //allow sleep
 );
+var synth = $("#audio_player").get(0);
 var selectedBody, mouseJoint;
 var ratio = 30; // for converting box2d units to display and vice versa
 var doSleep = true;
@@ -37,10 +40,13 @@ var iteration = 12;
       debugDraw.SetLineThickness(1.0);
       debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
       world.SetDebugDraw(debugDraw);
+var ellapsed, lastTime;
+
+PImage spriteSheet;
 
 void setup()
 {
-  size( 640, 800 );
+  size( 640, 800, OPENGL );
   smooth();
   fill( 0 );
   ellipseMode( CENTER );
@@ -49,7 +55,10 @@ void setup()
   for (var i = 0; i < bodies.length; i++) {
     bodies[i] = new Body(Math.ceil(random(2,10)), Math.random()*500, Math.random()*400, Math.random()*40+10, Math.random()*40+10);
   };
-
+  lastTime = 0;
+  spriteSheet = loadImage("img/sheet.png");
+  //textureMode(NORMALIZED);
+  hint(DISABLE_DEPTH_TEST);
 }
 
 void draw()
@@ -63,6 +72,8 @@ void draw()
   world.Step(1 / 60, 15, 15);
   world.DrawDebugData();
   world.ClearForces();
+  ellapsed = millis()-lastTime;
+  lastTime = millis();
 }
 b2Body getBodyAtMouse() {
   mousePVec = new b2Vec2(mouseX/30, mouseY/30);

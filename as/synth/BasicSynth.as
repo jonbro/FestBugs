@@ -18,7 +18,7 @@ package synth
 	 * 
 	 * @author Andre Michelle
 	 */
-	[SWF(backgroundColor="#000000", frameRate="31", width="768", height="768")]
+	[SWF(backgroundColor="#000000", frameRate="31", width="1", height="1")]
 	public final class BasicSynth extends AbstractApplication
 	{
 		private var _voice : Voice = new Voice();
@@ -26,36 +26,7 @@ package synth
 		private var _selectMode: Boolean;
 
 		public function BasicSynth(){
-			_container = new Sprite();
-			_container.x = 128;
-			_container.y = 128;
-			 addChild( _container );
-			for( var u: int = 0 ; u < 16 ; ++u )
-			{
-				for( var v: int = 0 ; v < 16 ; ++v )
-				{
-					var button: Button = new Button( u, v );
-					
-					button.x = ( u << 5 );
-					button.y = ( v << 5 );
-					_container.addChild( button );
-				}
-			}
-
 			ExternalInterface.addCallback("queueNote", queueNote);
-
-			addEventListener( MouseEvent.MOUSE_DOWN, mouseDown );
-		}
-		private function mouseDown( event : MouseEvent ) : void
-		{
-			var button: Button = event.target as Button;
-			
-			if( null != button )
-			{
-				button.selected = _selectMode = !button.selected;
-				_voice.queue(60);				
-				//changePattern( button.u, button.v, button.selected );
-			}
 		}
 		public function queueNote(note:int) : void
 		{

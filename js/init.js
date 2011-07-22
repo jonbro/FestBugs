@@ -1,6 +1,8 @@
 // lets load all the processing stuff over ajax and execute it once it has all been loaded
-var toLoad = ["js/processing.js", "js/Box2dWeb-2.1.a.3.js", "js/body.pjs", "js/pjs_chars.pjs"];
+var toLoad = ["js/sheet.json", "js/processing.js", "js/Box2dWeb-2.1.a.3.js", "js/body.pjs", "js/pjs_chars.pjs"];
 $(document).ready(function(){
+  var synth = $("#audio_player");
+
   // wait for the canvas to load before kicking off the ajax stuff
   $(window).load(function(){
     var loadCount = 0;
@@ -50,6 +52,15 @@ $(document).ready(function(){
             downloadComplete();
           }
         });
+      }else if(end == "json"){
+        $.ajax({
+          url: v,
+          dataType: 'json',
+          success: function(data){
+            ssData = data;
+            downloadComplete();
+          }
+        });        
       }
     });      
   });
