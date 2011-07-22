@@ -12,6 +12,7 @@ class Body{
   int note;
   var noteTime;
   var noteCounter;
+  string spr;
   Body(numSegments, x, y, w, h){
     seg = new BodySegment[numSegments];
     for (var i = 0; i < seg.length; i++) {
@@ -88,6 +89,8 @@ class Body{
     note = Math.floor(random(50, 80));
     noteTime = random(10)*500;
     noteCounter = noteTime;
+    parts = ["body_1.png", "body_2.png", "body_3.png"];
+    spr = parts[floor(random()*parts.length)];
 
   }
 
@@ -103,7 +106,6 @@ class Body{
       texture(spriteSheet);
       b = color((seg.length-i)/seg.length*255*(noteCounter/noteTime), (seg.length-i)/seg.length*255*(noteCounter/noteTime), (seg.length-i)/seg.length*255*(noteCounter/noteTime));
       fill(blendColor(c, b, SOFT_LIGHT));
-      spr = "body_2.png";
       vertex(seg[i].ne.GetWorldCenter().x*ratio, seg[i].ne.GetWorldCenter().y*ratio, getUV(spr, "e"), getUV(spr, "n"));
       vertex(seg[i].se.GetWorldCenter().x*ratio, seg[i].se.GetWorldCenter().y*ratio, getUV(spr, "e"), getUV(spr, "s"));
       vertex(seg[i].sw.GetWorldCenter().x*ratio, seg[i].sw.GetWorldCenter().y*ratio, getUV(spr, "w"), getUV(spr, "s"));
