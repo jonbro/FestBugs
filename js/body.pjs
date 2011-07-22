@@ -103,10 +103,11 @@ class Body{
       texture(spriteSheet);
       b = color((seg.length-i)/seg.length*255*(noteCounter/noteTime), (seg.length-i)/seg.length*255*(noteCounter/noteTime), (seg.length-i)/seg.length*255*(noteCounter/noteTime));
       fill(blendColor(c, b, SOFT_LIGHT));
-      vertex(seg[i].ne.GetWorldCenter().x*ratio, seg[i].ne.GetWorldCenter().y*ratio);
-      vertex(seg[i].se.GetWorldCenter().x*ratio, seg[i].se.GetWorldCenter().y*ratio);
-      vertex(seg[i].sw.GetWorldCenter().x*ratio, seg[i].sw.GetWorldCenter().y*ratio);
-      vertex(seg[i].nw.GetWorldCenter().x*ratio, seg[i].nw.GetWorldCenter().y*ratio);
+      spr = "body_2.png";
+      vertex(seg[i].ne.GetWorldCenter().x*ratio, seg[i].ne.GetWorldCenter().y*ratio, getUV(spr, "e"), getUV(spr, "n"));
+      vertex(seg[i].se.GetWorldCenter().x*ratio, seg[i].se.GetWorldCenter().y*ratio, getUV(spr, "e"), getUV(spr, "s"));
+      vertex(seg[i].sw.GetWorldCenter().x*ratio, seg[i].sw.GetWorldCenter().y*ratio, getUV(spr, "w"), getUV(spr, "s"));
+      vertex(seg[i].nw.GetWorldCenter().x*ratio, seg[i].nw.GetWorldCenter().y*ratio, getUV(spr, "w"), getUV(spr, "n"));
       endShape();
     };
     // draw the eyes

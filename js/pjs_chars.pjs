@@ -96,7 +96,20 @@ b2Body getBodyAtMouse() {
   }, aabb);
   return selectedBody;
 }
-
+// returns the  position on the sprite sheet for the frame and corner specified
+float getUV(frame, corner){
+  frame = ssData.frames[frame].frame;
+  if(corner == "n"){
+    return frame.y;
+  }else if(corner == "e"){
+    return frame.x+frame.w;
+  }else if(corner == "s"){
+    return frame.y+frame.h;
+  }else if(corner == "w"){
+    return frame.x;
+  }
+  return 0;
+};
 
 void update() {
 
