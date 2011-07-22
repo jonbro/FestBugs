@@ -3,7 +3,6 @@ require 'active_resource'
 require 'base64'
 require 'cgi'
 require 'openssl'
-require './keys.rb'
 
 get '/' do
 	redirect to('/index.html')
