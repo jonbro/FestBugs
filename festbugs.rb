@@ -3,6 +3,15 @@ require 'active_resource'
 require 'base64'
 require 'cgi'
 require 'openssl'
+require 'net/http'
+
+def urlSafeBase64Decode(base64String)
+  return Base64.decode64(base64String.tr('-_','+/'))
+end
+
+def urlSafeBase64Encode(raw)
+  return Base64.encode64(raw).tr('+/','-_')
+end
 
 get '/' do
 	redirect to('/index.html')
@@ -10,6 +19,15 @@ end
 
 get '/hi' do
 	DIGEST = OpenSSL::Digest::Digest.new('sha1')
-	hmac = OpenSSL::HMAC.digest(DIGEST, ENV['FESTIVAL_SECRET'], ENV['FESTIVAL_KEY'])
-	return hmac
+	url = "/events?festival=fringe&key=#{ENV['FESTIVAL_KEY']}"
+	sig = OpenSSL::HMAC.hexdigest(DIGEST, ENV['FESTIVAL_SECRET'], url)
+	url = "http://api.festivalslab.com"+url+"&signature=#{sig}"
+	url = URI.parse(url)
+	# start the http object
+	resp = Net::HTTP.new(url.host).start{|http|
+		# return url.path+url.query
+		http.get(url.path+"?"+url.query, {'Accept'=>'application/json'})
+	}
+	resp_text = resp.body
+	return resp_text
 end
