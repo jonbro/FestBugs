@@ -11,6 +11,6 @@ end
 
 get '/hi' do
 	DIGEST = OpenSSL::Digest::Digest.new('sha1')
-	hmac = OpenSSL::HMAC.digest(DIGEST, $privKey, $pubKey)
+	hmac = OpenSSL::HMAC.digest(DIGEST, ENV['FESTIVAL_SECRET'], ENV['FESTIVAL_KEY'])
 	return hmac
 end
