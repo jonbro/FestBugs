@@ -96,7 +96,7 @@ a{
 .event, form{
   font-family: 'Quattrocento Sans', helvetica, arial, sans-serif;
   font-size: 16px;
-  padding: 0 24px;
+  padding: 10px 24px;
   line-height: 20px;
 }
 .event{
