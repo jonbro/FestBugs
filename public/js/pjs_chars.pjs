@@ -4,7 +4,7 @@ ParticleSystem physics;
 
 Particle p;
 Spring s;
-Body[] bodies;
+ArrayList bodies;
 var b2Vec2 = Box2D.Common.Math.b2Vec2
   , b2AABB = Box2D.Collision.b2AABB
   , b2BodyDef = Box2D.Dynamics.b2BodyDef
@@ -54,9 +54,10 @@ void setup()
   smooth();
   fill( 0 );
   ellipseMode( CENTER );
-  bodies = new Body[0];
-  /*bodies = new Body[3];
-  for (var i = 0; i < bodies.length; i++) {
+  bodies = new ArrayList();  // Create an empty ArrayList
+
+  //bodies = new Body[0];
+  /*for (var i = 0; i < bodies.length; i++) {
     bodies[i] = new Body(Math.ceil(random(2,10)), Math.random()*500, Math.random()*400, Math.random()*40+10, Math.random()*40+10);
   };
   */
@@ -66,17 +67,27 @@ void setup()
   //textureMode(NORMALIZED);
   hint(DISABLE_DEPTH_TEST);
 }
-void addBody()
+void addBody(id)
 {
-    bodies.push(new Body(Math.ceil(random(2,10)), Math.random()*500, Math.random()*400, Math.random()*40+10, Math.random()*40+10));
+  bodies.add(new Body(Math.ceil(random(2,10)), Math.random()*500, Math.random()*400, Math.random()*40+10, Math.random()*40+10, id));
+}
+void removeBody(bodyId){
+  for (var i = 0; i < bodies.size(); i++) {
+    Body body = (Body) bodies.get(i);
+    if(body.id == bodyId){
+      bodies.remove(i);
+      return;
+    }
+  }
 }
 void draw()
 {
   colorMode(RGB, 255)
   fill(0xe8fffa);
   rect(0,0,width, height);
-  for (var i = 0; i < bodies.length; i++) {
-    bodies[i].draw();
+  for (var i = 0; i < bodies.size(); i++) {
+    Body body = (Body) bodies.get(i);
+    body.draw();
   };
   update();
   world.Step(1 / 60, 15, 15);
@@ -144,7 +155,7 @@ void drawShape(shape,body) {
       }
       endShape();
       break;
-  }
+    }
 }
 void createJoint(a, b, d, f){
   joint = new b2DistanceJointDef();
@@ -184,3 +195,4 @@ void createNode(x, y, r){
   body.shape = fixDef.shape;
   return body;
 }
+  

@@ -31,14 +31,19 @@ var parseSearchResults = function(results){
 				"<div class='name'>"+v.title+" "+web+"</div>",
 				"<div class='venue'><span class='bold'>@</span>"+v.venue.name+"</div>",
 				"<a href='#' class='to_pond'>add to pond</a>",
+				"<a href='#' class='from_pond'>remove from pond</a>",
+				"<div class='clear'/>",
 			"</div>"
 		].join("\n");
 		$("#search_results").append(eventHtml);
 	});
 	// now that we have attached all of the events to the dom, attach all of the events that can occur
 	$('.to_pond').click(function(){
-		p5.addBody();
-		// move the element into the pond list
+		p5.addBody($(this).parent().attr('id'));
 		$(this).parent().appendTo('#pond')
 	});
+	$('.from_pond').click(function(){
+		p5.removeBody($(this).parent().attr('id'));
+		$(this).parent().remove();		
+	})
 };

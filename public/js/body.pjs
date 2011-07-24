@@ -13,7 +13,10 @@ class Body{
   var noteTime;
   var noteCounter;
   string spr;
-  Body(numSegments, x, y, w, h){
+  string id;
+
+  Body(numSegments, x, y, w, h, _id){
+    id = _id;
     seg = new BodySegment[numSegments];
     for (var i = 0; i < seg.length; i++) {
         seg[i] = new BodySegment((x+10)/ratio, (y+i*(h*1.3))/ratio, (numSegments-i)/numSegments*w/ratio, h/ratio, (numSegments-i)/numSegments*14+7);

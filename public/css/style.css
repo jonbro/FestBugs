@@ -74,6 +74,9 @@ table{
 html, body{
   height: 100%;
 }
+.clear{
+  clear:both;
+}
 body{
   background: #e8fffa url(../img/bg.gif) top right repeat-y;
 }
@@ -102,12 +105,19 @@ a{
 .event{
   font-size: .9em;
   border-bottom: 1px solid #ccc;
+  clear: both;
 }
 .event .name{
   font-size: 1.2em;
   padding-bottom: 0.4em;
 }
-
+#pond .event .from_pond, #search_results .event .to_pond{
+  display: block;
+  float: right;
+}
+#pond .event .to_pond, #search_results .event .from_pond{
+  display: none;
+}
 #empty_pond{
   color: #666;
   font-size: 12px;
