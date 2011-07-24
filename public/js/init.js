@@ -7,7 +7,7 @@ $(document).ready(function(){
   $(window).load(function(){
     var loadCount = 0;
     var toExecute = new Array();
-
+    var processing_element;
     // this gets kicked off after all the files have been loaded
     var downloadComplete = function(){
       loadCount++;
@@ -26,9 +26,13 @@ $(document).ready(function(){
         // console.log($("#processing-canvas").get(0).getContext());
         console.log($("canvas").get(0));
         console.log(processingCode);
-        var test = new Processing(document.getElementById("processing-canvas"), processingCode);
+        processing_element = new Processing(document.getElementById("processing-canvas"), processingCode);
       }
     }
+    // when the window resizes, resize the processing canvas to fit
+    $(this).resize(function(){
+      processing_element.size($(window).width()-284, $(window).height());
+    });
     // fire off a whole pile of loads
     $.each(toLoad, function(i, v){
       // split the file name on the ending

@@ -10,6 +10,8 @@ $("#submit_title_search").click(function(){
 
 var parseSearchResults = function(results){
 	console.log(results);
+	// clear the search results
+	$("#search_results").html("");
 	$.each(results, function(i,v){
 		// build the html
 		var eventHtml = [
@@ -18,6 +20,6 @@ var parseSearchResults = function(results){
 				"<div class='venue'><span class='bold'>@</span>"+v.venue.name+"</div>",
 			"</div>"
 		].join("\n");
-		$("#event_list").append(eventHtml);
+		$("#search_results").append(eventHtml);
 	});
 };

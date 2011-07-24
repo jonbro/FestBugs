@@ -68,7 +68,8 @@ void setup()
 void draw()
 {
   colorMode(RGB, 255)
-  background(0xEEEEEE);
+  fill(0xe8fffa);
+  rect(0,0,width, height);
   for (var i = 0; i < bodies.length; i++) {
     bodies[i].draw();
   };

@@ -6,7 +6,7 @@
 	<!--[if IE]>
 		<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
-	<link href='http://fonts.googleapis.com/css?family=Pacifico&v1' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Pacifico|Quattrocento+Sans&v2' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" type="text/css" href="css/style.css" />
 
 	<script type="text/javascript" src="js/jquery-1.6.1.min.js"></script>	
@@ -20,14 +20,26 @@
 		</div>
 		<div id="right_column">
 			<div id="header" class="header">
-				<a href="about.html">about &rt;&rt;</a>
+				<a href="about.html" class="header_link">about &raquo;</a>
 				Festbugs
+			</div>
+			<div class="header">
+				<a href="about.html" class="header_link">link to pond</a>
+				Your Pond
+			</div>
+			<div id="pond">
+				<div class="event" id="empty_pond">
+					You don't have any bugs in your pond yet! Use the search below to find and add them.
+				</div>
+			</div>
+			<div class="header">
+				Search
 			</div>
 			<form id="search_box">
 				<input type="text" name="title_input" id="title_input"></input>
-				<a href="#" id="submit_title_search">Search</a>
+				<a href="#" id="submit_title_search">GO</a>
 			</form>
-			<div id="event_list">
+			<div id="search_results">
 				<div class="event festival_art">
 					<div class="name">Dutch Landscapes</div>
 					<div class="venue"><span class="bold">@</span>The Queen's Gallery</div>
