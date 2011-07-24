@@ -9,14 +9,13 @@ $("#submit_title_search").click(function(){
 
 
 var parseSearchResults = function(results){
+	console.log(results);
 	$.each(results, function(i,v){
 		// build the html
 		var eventHtml = [
-			"<div class='event festival_"+v.festival_id+"'>",
+				"<div class='event festival_"+v.festival_id+"' id='event_"+v.code+"'>",
 				"<div class='name'>"+v.title+"</div>",
 				"<div class='venue'><span class='bold'>@</span>"+v.venue.name+"</div>",
-				"<div class='date'>August 7th</div>",
-				"<div class='time'>1pm - 6pm</div>",
 			"</div>"
 		].join("\n");
 		$("#event_list").append(eventHtml);
