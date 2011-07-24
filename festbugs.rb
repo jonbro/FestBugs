@@ -17,15 +17,14 @@ get '/' do
 	redirect to('/index.html')
 end
 
-get '/hi' do
+get '/search/:name' do
 	DIGEST = OpenSSL::Digest::Digest.new('sha1')
-	url = "/events?festival=fringe&key=#{ENV['FESTIVAL_KEY']}"
+	url = "/events?title=#{CGI::escape(params[:name])}&key=#{ENV['FESTIVAL_KEY']}"
 	sig = OpenSSL::HMAC.hexdigest(DIGEST, ENV['FESTIVAL_SECRET'], url)
 	url = "http://api.festivalslab.com"+url+"&signature=#{sig}"
 	url = URI.parse(url)
 	# start the http object
 	resp = Net::HTTP.new(url.host).start{|http|
-		# return url.path+url.query
 		http.get(url.path+"?"+url.query, {'Accept'=>'application/json'})
 	}
 	resp_text = resp.body

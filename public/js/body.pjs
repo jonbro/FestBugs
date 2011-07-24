@@ -146,7 +146,9 @@ class Body{
     noteCounter -= ellapsed;
     if(noteCounter < 0){
       noteCounter += noteTime;
-      synth.queueNote(note);
+      if(!mute){
+        synth.queueNote(note);      
+      }
       target = new b2Vec2((noise(millis()/p2+goalPhase)*width)/ratio, (noise(millis()/p2+goalPhase2)*height)/ratio); // TODO: I should stop hard coding this at some point
       headCenter = head.GetWorldCenter();
       target.Subtract(headCenter);

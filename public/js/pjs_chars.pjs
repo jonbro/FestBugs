@@ -33,13 +33,17 @@ var ratio = 30; // for converting box2d units to display and vice versa
 var doSleep = true;
 var timeStep = 1.0/30;
 var iteration = 12;
-         var debugDraw = new b2DebugDraw();
-      debugDraw.SetSprite(document.getElementById("debug").getContext("2d"));
-      debugDraw.SetDrawScale(30.0);
-      debugDraw.SetFillAlpha(0.5);
-      debugDraw.SetLineThickness(1.0);
-      debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
-      world.SetDebugDraw(debugDraw);
+
+// setup the debug drawing
+// var debugDraw = new b2DebugDraw();
+// debugDraw.SetSprite(document.getElementById("debug").getContext("2d"));
+// debugDraw.SetDrawScale(30.0);
+// debugDraw.SetFillAlpha(0.5);
+// debugDraw.SetLineThickness(1.0);
+// debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
+// world.SetDebugDraw(debugDraw);
+
+
 var ellapsed, lastTime;
 
 PImage spriteSheet;

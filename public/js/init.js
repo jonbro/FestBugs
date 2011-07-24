@@ -1,8 +1,8 @@
 // lets load all the processing stuff over ajax and execute it once it has all been loaded
-var toLoad = ["js/sheet.json", "js/processing.js", "js/Box2dWeb-2.1.a.3.js", "js/body.pjs", "js/pjs_chars.pjs"];
+var toLoad = ["js/sheet.json", "js/search_system.js", "js/processing.js", "js/Box2dWeb-2.1.a.3.js", "js/body.pjs", "js/pjs_chars.pjs"];
+var mute = true;
 $(document).ready(function(){
   var synth = $("#audio_player");
-
   // wait for the canvas to load before kicking off the ajax stuff
   $(window).load(function(){
     var loadCount = 0;
@@ -11,6 +11,8 @@ $(document).ready(function(){
     // this gets kicked off after all the files have been loaded
     var downloadComplete = function(){
       loadCount++;
+      console.log(loadCount, toLoad.length);
+
       if (loadCount >= toLoad.length){
         var processingCode = "";
         // concat all of the processing code together
@@ -40,6 +42,7 @@ $(document).ready(function(){
           url: v,
           dataType: 'script',
           success: function(data){
+            console.log(v);
             downloadComplete();
           }
         });
@@ -48,6 +51,7 @@ $(document).ready(function(){
           url: v,
           dataType: 'text',
           success: function(data){
+            console.log(v);
             toExecute[i] = data;
             downloadComplete();
           }
@@ -57,6 +61,7 @@ $(document).ready(function(){
           url: v,
           dataType: 'json',
           success: function(data){
+            console.log(v);
             ssData = data;
             downloadComplete();
           }
