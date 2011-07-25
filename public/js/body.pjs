@@ -103,16 +103,27 @@ class Body{
     // };
 
     // draw as a tape
-    noStroke();
+    //noStroke();
     for (var i = seg.length - 1; i >= 0; i--) {
-      beginShape();
+      if(i>0){
+        sp = spr
+      }else{
+        sp = "fringe_head_2.png";      
+      }
+      beginShape(TRIANGLE_STRIP);
       texture(spriteSheet);
       b = color((seg.length-i)/seg.length*255*(noteCounter/noteTime), (seg.length-i)/seg.length*255*(noteCounter/noteTime), (seg.length-i)/seg.length*255*(noteCounter/noteTime));
       fill(blendColor(c, b, SOFT_LIGHT));
-      vertex(seg[i].ne.GetWorldCenter().x*ratio, seg[i].ne.GetWorldCenter().y*ratio, getUV(spr, "e"), getUV(spr, "n"));
-      vertex(seg[i].se.GetWorldCenter().x*ratio, seg[i].se.GetWorldCenter().y*ratio, getUV(spr, "e"), getUV(spr, "s"));
-      vertex(seg[i].sw.GetWorldCenter().x*ratio, seg[i].sw.GetWorldCenter().y*ratio, getUV(spr, "w"), getUV(spr, "s"));
-      vertex(seg[i].nw.GetWorldCenter().x*ratio, seg[i].nw.GetWorldCenter().y*ratio, getUV(spr, "w"), getUV(spr, "n"));
+      vertex(seg[i].sw.GetWorldCenter().x*ratio, seg[i].sw.GetWorldCenter().y*ratio, getUV(sp, "w"), getUV(sp, "s"));
+      vertex(seg[i].se.GetWorldCenter().x*ratio, seg[i].se.GetWorldCenter().y*ratio, getUV(sp, "e"), getUV(sp, "s"));
+      vertex(seg[i].nw.GetWorldCenter().x*ratio, seg[i].nw.GetWorldCenter().y*ratio, getUV(sp, "w"), getUV(sp, "n"));
+      vertex(seg[i].ne.GetWorldCenter().x*ratio, seg[i].ne.GetWorldCenter().y*ratio, getUV(sp, "e"), getUV(sp, "n"));
+      // draw the connection segment if we are not at the last one
+      if(i>0){
+        vertex(seg[i-1].sw.GetWorldCenter().x*ratio, seg[i-1].sw.GetWorldCenter().y*ratio, getUV(sp, "w"), getUV(sp, "s"));
+        vertex(seg[i-1].se.GetWorldCenter().x*ratio, seg[i-1].se.GetWorldCenter().y*ratio, getUV(sp, "e"), getUV(sp, "s"));
+        
+      }
       endShape();
     };
     // draw the eyes

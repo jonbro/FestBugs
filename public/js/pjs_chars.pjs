@@ -69,7 +69,7 @@ void setup()
 }
 void addBody(id)
 {
-  bodies.add(new Body(Math.ceil(random(2,10)), Math.random()*500, Math.random()*400, Math.random()*40+10, Math.random()*40+10, id));
+  bodies.add(new Body(Math.ceil(random(2,10)), Math.random()*500, Math.random()*400, Math.random()*40+50, Math.random()*40+50, id));
 }
 void removeBody(bodyId){
   for (var i = 0; i < bodies.size(); i++) {
