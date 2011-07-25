@@ -95,8 +95,10 @@ a{
   font-size: 15px; 
   padding-top: 9px;
 }
-
-.event, form{
+#pond_link{
+  display: none;
+}
+.event, form, #pond_link{
   font-family: 'Quattrocento Sans', helvetica, arial, sans-serif;
   font-size: 16px;
   padding: 10px 24px;
@@ -123,7 +125,10 @@ a{
   font-size: 12px;
   font-style: italic;
 }
-form input{
+#get_pond_link{
+  display:none;
+}
+form input, #pond_link input{
   border: 1px solid #000;
   font-family: 'Quattrocento Sans', helvetica, arial, sans-serif;
   font-size: 16px;
@@ -136,7 +141,7 @@ form #submit_title_search{
   padding-top: 10px;
   display: block;
 }
-#loading{
+#loading, #loading_pond{
   display: none;
 }
 #search_results{

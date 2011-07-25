@@ -50,6 +50,8 @@ get '/pond/create/:events' do
 	@pond = Pond.new()
 	@pond.save()
 	p params[:events].split(" ")
+	# TODO: check to see if there is a pond that already contains the bugs that we requested for this pond
+	
 	# for each of the events that were chucked at us
 	params[:events].split(" ").each{|event|
 		# find or create the associated event in the db

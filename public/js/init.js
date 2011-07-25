@@ -1,7 +1,16 @@
 // lets load all the processing stuff over ajax and execute it once it has all been loaded
 var toLoad = ["js/sheet.json", "js/search_system.js", "js/processing.js", "js/Box2dWeb-2.1.a.3.js", "js/body.pjs", "js/pjs_chars.pjs"];
 var mute = false;
-    var p5;
+var p5;
+var pond = Array(); // contains a list of the bugs that are in the current pond
+var removeUrlFromPond = function(url){
+  for (var i = pond.length - 1; i >= 0; i--) {
+    if(pond[i] == url){
+      pond.splice(i, 1);
+      return;
+    }
+  };
+}
 $(document).ready(function(){
   var synth = $("#audio_player");
   // wait for the canvas to load before kicking off the ajax stuff
