@@ -1,6 +1,6 @@
 // lets load all the processing stuff over ajax and execute it once it has all been loaded
 var toLoad = ["js/sheet.json", "js/search_system.js", "js/processing.js", "js/Box2dWeb-2.1.a.3.js", "js/body.pjs", "js/pjs_chars.pjs"];
-var mute = true;
+var mute = false;
     var p5;
 $(document).ready(function(){
   var synth = $("#audio_player");

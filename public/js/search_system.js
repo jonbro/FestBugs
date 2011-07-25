@@ -1,5 +1,5 @@
 // defines the workings of the search system
-$("#submit_title_search").click(getSearchResults);
+$("#submit_title_search").click(function(){getSearchResults(); return false;});
 $("#search_box").submit(function(){
 	getSearchResults();
 	return false;
@@ -9,18 +9,20 @@ var getSearchResults = function(){
 	// go get the results from the server
 	var searchValue = $('#title_input').val();
 	$.getJSON('/search/'+searchValue, parseSearchResults)
+	$("#loading").fadeIn('fast');
 	return false;
 }
-
 var parseSearchResults = function(results){
 	// clear the search results
+	$("#loading").fadeOut('fast');
 	$("#search_results").html("");
+	console.log(results);
 	$.each(results, function(i,v){
 		// TODO: confirm that the event being returned has not already been added to the pond
 		// build the html
 		var web = "";
 		if(v.website){
-			web = "<a href='"+v.website+"'>web &raquo;</a>";
+			web = "<a href='"+v.website+"' target='new'>web &raquo;</a>";
 		}
 		var last = false;
 		if(i==results.length-1){

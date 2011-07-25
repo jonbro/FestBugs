@@ -1,3 +1,6 @@
-- motor the eyes back into place if they shift too far off
-- get the canvas position fixed under the header properly
-- get the sound stuff working
+- have loading indicator for the search results
+- go through the data and figure out mappings for all of the different stuff that sean gave me
+- get the link to a certain pond working
+- get the scaling of the pond working
+- expose the mute functionality to the user
+- the go button doesn't work

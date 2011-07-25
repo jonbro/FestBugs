@@ -136,6 +136,9 @@ form #submit_title_search{
   padding-top: 10px;
   display: block;
 }
+#loading{
+  display: none;
+}
 #search_results{
   clear: both;
   padding-top: 1em;
