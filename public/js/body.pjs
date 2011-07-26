@@ -14,9 +14,10 @@ class Body{
   string spr, head_spr, tail_spr;
   String[] bodySpr;
   String[] joinSpr;
-  string id;
+  String id, fest;
 
-  Body(numSegments, x, y, w, h, _id, fest){
+  Body(numSegments, x, y, w, h, _id, _fest){
+    fest = _fest;
     id = _id;
     seg = new BodySegment[numSegments];
     bodySpr = new String[numSegments];
@@ -164,8 +165,13 @@ class Body{
       target.Normalize();
       target.Multiply(200);
       // apply a force to the head
+
       head.ApplyForce(target, head.GetWorldCenter())
-      ps.addParticle(new Particle(new Vector3D(head.GetWorldCenter().x*ratio, head.GetWorldCenter().y*ratio, 0), head_spr));
+      p_spr = fest+"_particle_"+Math.ceil(Math.random()*2)+".png";
+
+      ps.addParticle(new Particle(new Vector3D(head.GetWorldCenter().x*ratio, head.GetWorldCenter().y*ratio, 0), p_spr));
+      ps.addParticle(new Particle(new Vector3D(head.GetWorldCenter().x*ratio, head.GetWorldCenter().y*ratio, 0), p_spr));
+      ps.addParticle(new Particle(new Vector3D(head.GetWorldCenter().x*ratio, head.GetWorldCenter().y*ratio, 0), p_spr));
     }
   }
 }

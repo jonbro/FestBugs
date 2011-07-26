@@ -70,6 +70,7 @@ void setup()
   overlay = loadImage("img/microscope_overlay.png");
   //textureMode(NORMALIZED);
   hint(DISABLE_DEPTH_TEST);
+  hint(ENABLE_OPENGL_4X_SMOOTH);
 }
 void addBody(id, festival)
 {
