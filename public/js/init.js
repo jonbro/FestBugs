@@ -30,6 +30,8 @@ var loadPondFromUrl = function(){
       p5.addBody(v.url, v.festival);
       $.getJSON('/event/'+v.url, function(edata){
         console.log(edata);
+          appendEventBlock(edata, "#pond");
+          attachEventEvents();
       });
     });
   });

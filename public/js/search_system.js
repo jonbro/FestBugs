@@ -32,30 +32,14 @@ var parseSearchResults = function(results){
 	$("#loading").fadeOut('fast');
 	$("#search_results").html("");
 	$.each(results, function(i,v){
-		// TODO: confirm that the event being returned has not already been added to the pond
-		// build the html
-		var web = "";
-		if(v.website){
-			web = "<a href='"+v.website+"' target='new'>web &raquo;</a>";
-		}
-		var last = false;
-		if(i==results.length-1){
-			last = true;
-		}
-		var eventHtml = [
-			"<div class='event festival_"+v.festival_id+(last?" event_last":"")+"' id='event_"+v.code+"'>",
-				"<div class='name'>"+v.title+" "+web+"</div>",
-				"<div class='venue'><span class='bold'>@</span>"+v.venue.name+"</div>",
-				"<a href='#' class='to_pond'>add to pond</a>",
-				"<a href='#' class='from_pond'>remove from pond</a>",
-				"<div class='clear'/>",
-				"<input class='url' value='"+getUUID(v.url)+"'>",
-				"<input class='festival' value='"+v.festival_id+"'>",
-			"</div>"
-		].join("\n");
-		$("#search_results").append(eventHtml);
+		appendEventBlock(v, "#search_results");
 	});
-	// now that we have attached all of the events to the dom, attach all of the events that can occur
+	attachEventEvents();
+};
+
+// har har har at this ambigous function name
+var attachEventEvents = function(){
+		// now that we have attached all of the events to the dom, attach all of the events that can occur
 	$('.to_pond').click(function(){
 		var url = $(this).parent().find(".url").val();
 		var festival = $(this).parent().find(".festival").val();
@@ -64,10 +48,6 @@ var parseSearchResults = function(results){
 		p5.addBody(url);
 		$(this).parent().appendTo('#pond');
 		hidePondLink();
-		if(pond.length){
-			$("#get_pond_link").fadeIn();
-			$("#empty_pond").fadeOut();
-		}
 		return false;
 	});
 	$('.from_pond').click(function(){
@@ -76,14 +56,40 @@ var parseSearchResults = function(results){
 		removeUrlFromPond(url);
 		$(this).parent().remove();	
 		hidePondLink();
-		if(!pond.length){
-			$("#get_pond_link").fadeOut();
-			$("#empty_pond").fadeIn();
-		}
 		return false;
-	})
+	});
+	if(!pond.length){
+		$("#get_pond_link").fadeOut();
+		$("#empty_pond").fadeIn();
+	}else{
+		$("#get_pond_link").fadeIn();
+		$("#empty_pond").fadeOut();
+	}
 };
 
+var appendEventBlock = function(data, target){
+	var v = data
+	// TODO: confirm that the event being returned has not already been added to the pond
+	// build the html
+	var web = "";
+	if(v.website){
+		web = "<a href='"+v.website+"' target='new'>web &raquo;</a>";
+	}
+	var eventHtml = [
+		"<div class='event festival_"+v.festival_id+"' id='event_"+v.code+"'>",
+			"<div class='name'>"+v.title+" "+web+"</div>",
+			"<div class='venue'><span class='bold'>@</span>"+v.venue.name+"</div>",
+			"<a href='#' class='to_pond'>add to pond</a>",
+			"<a href='#' class='from_pond'>remove from pond</a>",
+			"<div class='clear'/>",
+			"<input class='url' value='"+getUUID(v.url)+"'>",
+			"<input class='festival' value='"+v.festival_id+"'>",
+		"</div>"
+	].join("\n");
+	$(target).append(eventHtml);
+	$(".events").removeClass('last');
+	$("#pond .events:last, #search_results .events:last").addClass('last');
+}
 var hidePondLink = function(){
 	$("#pond_link").fadeOut();
 }
