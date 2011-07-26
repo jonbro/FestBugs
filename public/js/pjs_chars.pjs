@@ -1,5 +1,4 @@
-/* @pjs preload="/img/sheet.png"; */
-/* @pjs preload="/img/microscope_overlay.png"; */
+/* @pjs preload="/img/sheet.png,/img/microscope_overlay.png"; */
 
 ParticleSystem physics;
 
