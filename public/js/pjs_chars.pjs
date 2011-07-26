@@ -67,7 +67,7 @@ void setup()
   //textureMode(NORMALIZED);
   hint(DISABLE_DEPTH_TEST);
 }
-void addBody(id)
+void addBody(id, festival)
 {
   bodies.add(new Body(Math.ceil(random(2,10)), Math.random()*500, Math.random()*400, Math.random()*40+50, Math.random()*40+50, id));
 }

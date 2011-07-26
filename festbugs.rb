@@ -30,6 +30,20 @@ get '/' do
 	redirect to('/index.html')
 end
 
+get '/event/:name' do
+	DIGEST = OpenSSL::Digest::Digest.new('sha1')
+	url = "/events/#{params[:name]}?key=#{ENV['FESTIVAL_KEY']}"
+	sig = OpenSSL::HMAC.hexdigest(DIGEST, ENV['FESTIVAL_SECRET'], url)
+	url = "http://api.festivalslab.com"+url+"&signature=#{sig}"
+	url = URI.parse(url)
+	# start the http object
+	resp = Net::HTTP.new(url.host).start{|http|
+		http.get(url.path+"?"+url.query, {'Accept'=>'application/json'})
+	}
+	resp_text = resp.body
+	return resp_text
+end
+
 get '/search/:name' do
 	DIGEST = OpenSSL::Digest::Digest.new('sha1')
 	url = "/events?title=#{CGI::escape(params[:name])}&key=#{ENV['FESTIVAL_KEY']}"
@@ -45,6 +59,21 @@ get '/search/:name' do
 end
 
 get '/pond/create/:events' do
+	ponds = DB[:ponds]
+	@pond = Pond.new()
+	@pond.save()
+	events = Rack::Utils.parse_nested_query(params[:events])["events"]
+	events.each{|k, event|
+		@event = Event.find_or_create(:festival => event["festival"], :url=>event["url"])
+		if not @pond.events.include?(@event)
+			@pond.add_event(@event)
+		end		
+	}
+	return @pond[:id].to_s
+end
+
+
+get '/pond/_/:events' do
 	# generate a new pond
 	ponds = DB[:ponds]
 	@pond = Pond.new()
@@ -68,7 +97,7 @@ get '/pond/:id' do
 	@pond = Pond.find(:id => params[:id])
 	event_ids = []
 	@pond.events.each{|event|
-		event_ids.push(event[:url].to_s)
+		event_ids.push("url"=>event[:url].to_s, "festival"=>event[:festival].to_s)
 	}
 	return event_ids.to_json
 end

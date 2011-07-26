@@ -7,7 +7,7 @@ $("#search_box").submit(function(){
 $("#get_pond_link").click(function(){
 	//pack up the data describing the pond and send it along to the server.
 	$.ajax({
-		url: "/pond/create/"+pond.join("+"),
+		url: "/pond/create/"+$.param({'events':pond}),
 		success: function(data){
 			$("#pond_url").val("http://festipods.co.uk/#pond_"+data);
 			$("#pond_link").fadeIn();
@@ -31,7 +31,6 @@ var parseSearchResults = function(results){
 	// clear the search results
 	$("#loading").fadeOut('fast');
 	$("#search_results").html("");
-	console.log(results);
 	$.each(results, function(i,v){
 		// TODO: confirm that the event being returned has not already been added to the pond
 		// build the html
@@ -51,6 +50,7 @@ var parseSearchResults = function(results){
 				"<a href='#' class='from_pond'>remove from pond</a>",
 				"<div class='clear'/>",
 				"<input class='url' value='"+getUUID(v.url)+"'>",
+				"<input class='festival' value='"+v.festival_id+"'>",
 			"</div>"
 		].join("\n");
 		$("#search_results").append(eventHtml);
@@ -58,8 +58,9 @@ var parseSearchResults = function(results){
 	// now that we have attached all of the events to the dom, attach all of the events that can occur
 	$('.to_pond').click(function(){
 		var url = $(this).parent().find(".url").val();
+		var festival = $(this).parent().find(".festival").val();
 		// add the url to the list of bodies in the pond
-		pond.push(url);
+		pond.push({'url':url, 'festival':festival});
 		p5.addBody(url);
 		$(this).parent().appendTo('#pond');
 		hidePondLink();

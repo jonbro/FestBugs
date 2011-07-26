@@ -11,6 +11,30 @@ var removeUrlFromPond = function(url){
     }
   };
 }
+var emptyPond = function(){
+  pond = Array();
+  $("#pond .event").remove();  
+  hidePondLink();
+  $("#get_pond_link").fadeOut();
+  $("#empty_pond").fadeIn();
+};
+var loadPondFromUrl = function(){
+  // first, empty the pond
+  // extract the pond id from the url
+  var id = document.location.hash.split("_")[document.location.hash.split("_").length-1];
+  console.log("about to load");
+  // fire off a json load
+  $.getJSON('/pond/'+id, function(data){
+    $.each(data, function(i,v){
+      pond.push({'url':v.url, 'festival':v.festival});
+      p5.addBody(v.url, v.festival);
+      $.getJSON('/event/'+v.url, function(edata){
+        console.log(edata);
+      });
+    });
+  });
+};
+
 $(document).ready(function(){
   var synth = $("#audio_player");
   // wait for the canvas to load before kicking off the ajax stuff
@@ -33,9 +57,11 @@ $(document).ready(function(){
         // setup the processing context with the source code
         // console.log(document.getElementById("processing-canvas").getContext
         // console.log($("#processing-canvas").get(0).getContext());
-        console.log($("canvas").get(0));
-        console.log(processingCode);
         p5 = new Processing(document.getElementById("processing-canvas"), processingCode);
+        // check to see if there is a pond in the url, and if so, fire off the requests that will give us the data about what to include in the pond
+        if(document.location.hash){
+          loadPondFromUrl()
+        }        
       }
     }
     // when the window resizes, resize the processing canvas to fit
