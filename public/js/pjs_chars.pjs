@@ -1,4 +1,5 @@
 /* @pjs preload="img/sheet.png"; */
+/* @pjs preload="img/microscope_overlay.png"; */
 
 ParticleSystem physics;
 
@@ -47,10 +48,11 @@ var iteration = 12;
 var ellapsed, lastTime;
 
 PImage spriteSheet;
+PImage overlay;
 
 void setup()
 {
-  size( 640, 800, OPENGL );
+  size( 800, 800, OPENGL );
   smooth();
   fill( 0 );
   ellipseMode( CENTER );
@@ -64,6 +66,7 @@ void setup()
 
   lastTime = 0;
   spriteSheet = loadImage("img/sheet.png");
+  overlay = loadImage("img/microscope_overlay.png");
   //textureMode(NORMALIZED);
   hint(DISABLE_DEPTH_TEST);
 }
@@ -83,8 +86,7 @@ void removeBody(bodyId){
 }
 void draw()
 {
-  colorMode(RGB, 255)
-  fill(0xe8fffa);
+  background(0xE8fffa);
   rect(0,0,width, height);
   for (var i = 0; i < bodies.size(); i++) {
     Body body = (Body) bodies.get(i);
@@ -96,6 +98,15 @@ void draw()
   world.ClearForces();
   ellapsed = frameCount*30-lastTime;
   lastTime = frameCount*30;
+  // draw the overlay
+  noStroke();
+  beginShape(TRIANGLE_STRIP);
+  texture(overlay);
+  vertex(0, 0, 0, 0); // nw
+  vertex(0, height, 0, overlay.height); // sw
+  vertex(width, 0, overlay.width, 0); // ne
+  vertex(width, height, overlay.width, overlay.height); // se
+  endShape();
 }
 b2Body getBodyAtMouse() {
   mousePVec = new b2Vec2(mouseX/30, mouseY/30);
@@ -162,7 +173,7 @@ void createJoint(a, b, d, f){
   joint = new b2DistanceJointDef();
   joint.Initialize(a, b, a.GetWorldCenter(), b.GetWorldCenter());
   joint.dampingRatio = d;
-  joint.frequencyHz = 2;
+  joint.frequencyHz = f;
   return world.CreateJoint(joint);
 }
 void createRevJoint(a, b){

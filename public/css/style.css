@@ -73,16 +73,20 @@ table{
 /* http://www.reynoldsftw.com/2009/03/text-embossing-technique-with-css/ */
 html, body{
   height: 100%;
+  min-width: 800px;
+  background: #fff url(../img/bg.gif) left top repeat-y;
 }
 .clear{
   clear:both;
 }
 body{
-  background: #e8fffa url(../img/bg.gif) top right repeat-y;
-}
+}  
 a{
   color: #48afff;
   text-decoration: none;
+}
+#container{
+  width: 1084px;
 }
 .header {
   font-size: 24px;
@@ -149,11 +153,18 @@ form #submit_title_search{
   padding-top: 1em;
 }
 #left_column{
-  position: absolute;
   top: 30px;
   left: 0;
+  min-width: 800px;
+  overflow: hidden;
+  position: fixed;
 }
 #right_column{
   width: 284px;
   float: right;
+}
+
+/* data that we don't need to see */
+.url, .festival{
+  display: none;
 }

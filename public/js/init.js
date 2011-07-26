@@ -68,7 +68,8 @@ $(document).ready(function(){
     }
     // when the window resizes, resize the processing canvas to fit
     $(this).resize(function(){
-      p5.size($(window).width()-284, $(window).height());
+      var left = Math.max(0, ($(window).width()-284)/2-400);
+      $("#processing-canvas").css({left:left})
     });
     // fire off a whole pile of loads
     $.each(toLoad, function(i, v){

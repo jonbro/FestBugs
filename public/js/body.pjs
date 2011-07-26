@@ -6,7 +6,6 @@ class Body{
   float goalPhase, goalPhase2;
   color c;
   float headMass;
-  b2Body[] eyes;
   b2RevoluteJoint[] armJoints;
   b2Body[] hands;
   int note;
@@ -23,14 +22,14 @@ class Body{
     bodySpr = new String[numSegments];
     joinSpr = new String[numSegments];
     for (var i = 0; i < seg.length; i++) {
-        seg[i] = new BodySegment((x+10)/ratio, (y+i*(h*2))/ratio, w/ratio, h/ratio, (numSegments-i)/numSegments*14+7);
+        seg[i] = new BodySegment((x+10)/ratio, (y+i*(h*2))/ratio, w/ratio, h/ratio, (numSegments-i)/numSegments*10+10);
       // connect the body segments
       if(i>0){
-        createJoint(seg[i].ne, seg[i-1].se, 1, 20)
-        createJoint(seg[i].nw, seg[i-1].sw, 1, 20);
+        createJoint(seg[i].ne, seg[i-1].se, 1, 2)
+        createJoint(seg[i].nw, seg[i-1].sw, 1, 2);
         // // and crossbars
-        createJoint(seg[i].ne, seg[i-1].sw, 0.9, 10);
-        createJoint(seg[i].nw, seg[i-1].se, 0.9, 10);
+        createJoint(seg[i].ne, seg[i-1].sw, 0.9, 2);
+        createJoint(seg[i].nw, seg[i-1].se, 0.9, 2);
       }
       if(i!=0&&i!=seg.length){
         bodySpr[i] = fest+"_body_"+Math.ceil(Math.random()*6)+".png";;
@@ -43,22 +42,6 @@ class Body{
     createRevJoint(seg[0].ne, head);
     createRevJoint(seg[0].nw, head);
 
-    // create a bunch of eyes
-    eyeCount = Math.floor(Math.random()*5+2);
-    eyes = new b2Body[eyeCount];
-    // the eyes loop through 180 degrees adding an eye at equal intervals around the head
-    for (var i = 0; i < eyeCount; i++) {
-      var angle = (180 * i/eyeCount)-180+(1/eyeCount*180/2);
-      pos = new b2Vec2(cos(radians(angle)), sin(radians(angle)));
-      pos.Normalize();
-      // expand the eyes out a bit from the head
-      pos.Multiply(30/ratio);
-      pos.Add(head.GetWorldCenter());
-      // create the eye
-      eyes[i] = createNode(pos.x, pos.y, 5);
-      // attach the eye to the head
-      createRevJoint(head, eyes[i], 0.9)
-    };
     // add some simple arms
     armJoints = new b2RevoluteJoint[2];
     hands = new b2Body[2];
@@ -126,7 +109,6 @@ class Body{
       beginShape(TRIANGLE_STRIP);
       texture(spriteSheet);
       b = color((seg.length-i)/seg.length*255*(noteCounter/noteTime), (seg.length-i)/seg.length*255*(noteCounter/noteTime), (seg.length-i)/seg.length*255*(noteCounter/noteTime));
-      fill(blendColor(c, b, SOFT_LIGHT));
       vertex(seg[i].sw.GetWorldCenter().x*ratio, seg[i].sw.GetWorldCenter().y*ratio, getUV(sp, "w"), getUV(sp, "s"));
       vertex(seg[i].se.GetWorldCenter().x*ratio, seg[i].se.GetWorldCenter().y*ratio, getUV(sp, "e"), getUV(sp, "s"));
       vertex(seg[i].nw.GetWorldCenter().x*ratio, seg[i].nw.GetWorldCenter().y*ratio, getUV(sp, "w"), getUV(sp, "n"));
@@ -146,14 +128,7 @@ class Body{
       }
       endShape();
     };
-    // draw the eyes
-      for (var i = 0; i < eyes.length; i++) {
-        eyeCenter = eyes[i].GetWorldCenter()
-        fill(c);
-        ellipse(eyeCenter.x*ratio, eyeCenter.y*ratio, 25, 25);
-        fill(255);
-        ellipse(eyeCenter.x*ratio, eyeCenter.y*ratio, 10, 10);
-      };      
+
     // calculate a vector to the center of the screen from the head
     target = new b2Vec2((noise(millis()/p2+goalPhase)*width)/ratio, (noise(millis()/p2+goalPhase2)*height)/ratio); // TODO: I should stop hard coding this at some point
     fill(c);
