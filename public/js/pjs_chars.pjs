@@ -69,7 +69,8 @@ void setup()
 }
 void addBody(id, festival)
 {
-  bodies.add(new Body(Math.ceil(random(2,10)), Math.random()*500, Math.random()*400, Math.random()*40+50, Math.random()*40+50, id));
+  Math.seedrandom(id);
+  bodies.add(new Body(Math.ceil(Math.random()*8+2), Math.random()*500, Math.random()*400, Math.random()*40+50, Math.random()*40+50, id));
 }
 void removeBody(bodyId){
   for (var i = 0; i < bodies.size(); i++) {
@@ -93,8 +94,8 @@ void draw()
   world.Step(1 / 60, 15, 15);
   world.DrawDebugData();
   world.ClearForces();
-  ellapsed = millis()-lastTime;
-  lastTime = millis();
+  ellapsed = frameCount*30-lastTime;
+  lastTime = frameCount*30;
 }
 b2Body getBodyAtMouse() {
   mousePVec = new b2Vec2(mouseX/30, mouseY/30);

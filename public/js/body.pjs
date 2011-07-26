@@ -30,13 +30,13 @@ class Body{
       }
     };
     // create a head
-    head = createNode((x+10)/ratio, (y-1*30)/ratio, random(10, 30));
+    head = createNode((x+10)/ratio, (y-1*30)/ratio, Math.random()*20+10);
     // attach the head
     createRevJoint(seg[0].ne, head);
     createRevJoint(seg[0].nw, head);
 
     // create a bunch of eyes
-    eyeCount = Math.floor(random(2, 7));
+    eyeCount = Math.floor(Math.random()*5+2);
     eyes = new b2Body[eyeCount];
     // the eyes loop through 180 degrees adding an eye at equal intervals around the head
     for (var i = 0; i < eyeCount; i++) {
@@ -81,19 +81,19 @@ class Body{
 
 
 
-    p1 = 100 + (random()*2-1) * 50;
-    p2 = random(20000, 25000);
-    goalPhase = random(20000);
-    goalPhase2 = random(20000);
+    p1 = 100 + (Math.random()*2-1) * 50;
+    p2 = Math.random()*5000+20000;
+    goalPhase = Math.random()*20000;
+    goalPhase2 = Math.random()*20000;
     colorMode(HSB, 100);
     c = color(Math.random()*100, 100, 50);
 
     // for the synthesizer
-    note = Math.floor(random(50, 80));
-    noteTime = random(10)*500;
+    note = Math.floor(Math.random()*30+50);
+    noteTime = Math.random()*10*500;
     noteCounter = noteTime;
     parts = ["body_1.png", "body_2.png", "body_3.png"];
-    spr = parts[floor(random()*parts.length)];
+    spr = parts[floor(Math.random()*parts.length)];
 
   }
 
