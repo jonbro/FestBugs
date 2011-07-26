@@ -12,14 +12,18 @@ class Body{
   int note;
   var noteTime;
   var noteCounter;
-  string spr;
+  string spr, head_spr, tail_spr;
+  String[] bodySpr;
+  String[] joinSpr;
   string id;
 
-  Body(numSegments, x, y, w, h, _id){
+  Body(numSegments, x, y, w, h, _id, fest){
     id = _id;
     seg = new BodySegment[numSegments];
+    bodySpr = new String[numSegments];
+    joinSpr = new String[numSegments];
     for (var i = 0; i < seg.length; i++) {
-        seg[i] = new BodySegment((x+10)/ratio, (y+i*(h*1.3))/ratio, (numSegments-i)/numSegments*w/ratio, h/ratio, (numSegments-i)/numSegments*14+7);
+        seg[i] = new BodySegment((x+10)/ratio, (y+i*(h*2))/ratio, w/ratio, h/ratio, (numSegments-i)/numSegments*14+7);
       // connect the body segments
       if(i>0){
         createJoint(seg[i].ne, seg[i-1].se, 1, 20)
@@ -27,6 +31,10 @@ class Body{
         // // and crossbars
         createJoint(seg[i].ne, seg[i-1].sw, 0.9, 10);
         createJoint(seg[i].nw, seg[i-1].se, 0.9, 10);
+      }
+      if(i!=0&&i!=seg.length){
+        bodySpr[i] = fest+"_body_"+Math.ceil(Math.random()*6)+".png";;
+        joinSpr[i] = fest+"_join_"+Math.ceil(Math.random()*6)+".png";;
       }
     };
     // create a head
@@ -92,7 +100,10 @@ class Body{
     note = Math.floor(Math.random()*30+50);
     noteTime = Math.random()*10*500;
     noteCounter = noteTime;
-    parts = ["body_1.png", "body_2.png", "body_3.png"];
+    // decide on the various body parts
+    head_spr = fest+"_head_"+Math.ceil(Math.random()*10)+".png";
+    tail_spr = fest+"_tail_"+Math.ceil(Math.random()*6)+".png";
+    parts = ["book_body_1.png", "book_body_2.png", "book_body_3.png"];
     spr = parts[floor(Math.random()*parts.length)];
 
   }
@@ -103,12 +114,14 @@ class Body{
     // };
 
     // draw as a tape
-    //noStroke();
+    noStroke();
     for (var i = seg.length - 1; i >= 0; i--) {
-      if(i>0){
-        sp = spr
+      if(i==0){
+        sp = head_spr;      
+      }else if(i == seg.length-1){
+        sp = tail_spr;
       }else{
-        sp = "fringe_head_2.png";      
+        sp = bodySpr[1];
       }
       beginShape(TRIANGLE_STRIP);
       texture(spriteSheet);
@@ -118,10 +131,17 @@ class Body{
       vertex(seg[i].se.GetWorldCenter().x*ratio, seg[i].se.GetWorldCenter().y*ratio, getUV(sp, "e"), getUV(sp, "s"));
       vertex(seg[i].nw.GetWorldCenter().x*ratio, seg[i].nw.GetWorldCenter().y*ratio, getUV(sp, "w"), getUV(sp, "n"));
       vertex(seg[i].ne.GetWorldCenter().x*ratio, seg[i].ne.GetWorldCenter().y*ratio, getUV(sp, "e"), getUV(sp, "n"));
+      
+      // end the triangle
+      vertex(seg[i].ne.GetWorldCenter().x*ratio, seg[i].ne.GetWorldCenter().y*ratio, getUV(sp, "e"), getUV(sp, "n"));
+
       // draw the connection segment if we are not at the last one
       if(i>0){
-        vertex(seg[i-1].sw.GetWorldCenter().x*ratio, seg[i-1].sw.GetWorldCenter().y*ratio, getUV(sp, "w"), getUV(sp, "s"));
-        vertex(seg[i-1].se.GetWorldCenter().x*ratio, seg[i-1].se.GetWorldCenter().y*ratio, getUV(sp, "e"), getUV(sp, "s"));
+        sp = joinSpr[1];
+        vertex(seg[i].nw.GetWorldCenter().x*ratio, seg[i].nw.GetWorldCenter().y*ratio, getUV(sp, "w"), getUV(sp, "s"));
+        vertex(seg[i].ne.GetWorldCenter().x*ratio, seg[i].ne.GetWorldCenter().y*ratio, getUV(sp, "e"), getUV(sp, "s"));
+        vertex(seg[i-1].sw.GetWorldCenter().x*ratio, seg[i-1].sw.GetWorldCenter().y*ratio, getUV(sp, "w"), getUV(sp, "n"));
+        vertex(seg[i-1].se.GetWorldCenter().x*ratio, seg[i-1].se.GetWorldCenter().y*ratio, getUV(sp, "e"), getUV(sp, "n"));
         
       }
       endShape();

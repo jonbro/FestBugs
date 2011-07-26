@@ -12,4 +12,4 @@ JSSHELL ?= $(error Specify a valid path to a js shell binary in ~/.profile: expo
 
 build-sheet:
 	@@echo "\nBuilding sprite sheet:"
-	@@TexturePacker --format json --disable-rotation --no-trim --data js/sheet.json --sheet img/sheet.png ungrouped_sprites/*.png
+	@@TexturePacker --padding 1 --scale 0.5 --format json --disable-rotation --no-trim --data js/sheet.json --sheet img/sheet.png ungrouped_sprites/*.png

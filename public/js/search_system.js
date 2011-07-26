@@ -45,7 +45,7 @@ var attachEventEvents = function(){
 		var festival = $(this).parent().find(".festival").val();
 		// add the url to the list of bodies in the pond
 		pond.push({'url':url, 'festival':festival});
-		p5.addBody(url);
+		p5.addBody(url, festival);
 		$(this).parent().appendTo('#pond');
 		hidePondLink();
 		return false;

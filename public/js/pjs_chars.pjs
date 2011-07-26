@@ -70,7 +70,7 @@ void setup()
 void addBody(id, festival)
 {
   Math.seedrandom(id);
-  bodies.add(new Body(Math.ceil(Math.random()*8+2), Math.random()*500, Math.random()*400, Math.random()*40+50, Math.random()*40+50, id));
+  bodies.add(new Body(Math.ceil(Math.random()*6+2), Math.random()*500, Math.random()*400, Math.random()*40+50, Math.random()*40+50, id, festival));
 }
 void removeBody(bodyId){
   for (var i = 0; i < bodies.size(); i++) {
