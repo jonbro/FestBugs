@@ -49,13 +49,15 @@ var ellapsed, lastTime;
 PImage spriteSheet;
 PImage overlay;
 
+ParticleSystem ps;
 void setup()
 {
   size( 800, 800, OPENGL );
-  smooth();
+  //smooth();
   fill( 0 );
   ellipseMode( CENTER );
   bodies = new ArrayList();  // Create an empty ArrayList
+  ps = new ParticleSystem(1,new Vector3D(width/2,height/2,0));  
 
   //bodies = new Body[0];
   /*for (var i = 0; i < bodies.length; i++) {
@@ -87,6 +89,8 @@ void draw()
 {
   background(0xE8fffa);
   rect(0,0,width, height);
+  ps.run();  
+  //ps.addParticle();
   for (var i = 0; i < bodies.size(); i++) {
     Body body = (Body) bodies.get(i);
     body.draw();

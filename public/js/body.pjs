@@ -165,7 +165,7 @@ class Body{
       target.Multiply(200);
       // apply a force to the head
       head.ApplyForce(target, head.GetWorldCenter())
-
+      ps.addParticle(new Particle(new Vector3D(head.GetWorldCenter().x*ratio, head.GetWorldCenter().y*ratio, 0), head_spr));
     }
   }
 }
