@@ -1,6 +1,59 @@
 // lookup tables for rotation
-//Array ul[]
+float ul[];
+float ll[];
+float ur[];
+float lr[];
 
+// build out the tables
+void buildRotationArrays(){
+  ul = new float[720];
+  ll = new float[720];
+  ur = new float[720];
+  lr = new float[720];
+
+  int start = 225;
+  for(int i=0;i<360;i++)
+  {
+    ul[i*2    ] = cos(TWO_PI*((float)start/360));
+    ul[i*2 + 1] = sin(TWO_PI*((float)start/360));
+    start++;
+    if(start>=360)
+      start=0;
+  }
+  
+  //ur
+  start = 315;
+  for(int i=0;i<360;i++)
+  {
+    ur[i*2    ] = cos(TWO_PI*((float)start/360));
+    ur[i*2 + 1] = sin(TWO_PI*((float)start/360));
+    start++;
+    if(start>=360)
+      start=0;
+  }
+  
+  //lr
+  start = 45;
+  for(int i=0;i<360;i++)
+  {
+    lr[i*2    ] = cos(TWO_PI*((float)start/360));
+    lr[i*2 + 1] = sin(TWO_PI*((float)start/360));
+    start++;
+    if(start>=360)
+      start=0;
+  }
+  
+  //ll
+  start = 135;
+  for(int i=0;i<360;i++)
+  {
+    ll[i*2    ] = cos(TWO_PI*((float)start/360));
+    ll[i*2 + 1] = sin(TWO_PI*((float)start/360));
+    start++;
+    if(start>=360)
+      start=0;
+  }
+}
 // A simple Particle class
 
 class Particle {
@@ -8,7 +61,7 @@ class Particle {
   Vector3D vel;
   Vector3D acc;
   String tex;
-  float r;
+  float r, rot, rotSpeed;
   float timer;
 
   // One constructor
@@ -36,6 +89,8 @@ class Particle {
     r = 100.0;
     timer = 100.0;
     tex = t;
+    rot = 0;
+    rotSpeed = random(-4, 4);
   }
   void run() {
     update();
@@ -51,17 +106,22 @@ class Particle {
 
   // Method to display
   void render() {
-    r = (100-timer+30)/2;
-    c = new Vector3D(loc.x-r/2, loc.y-r/2);
+    r = (100-timer)/100.0*50;
     //loc.sub(r/2, r/2);
+    rot += rotSpeed;
     if(tex){
+      rot =rot%360;
+      if (rot<0)
+        rot+=360;
+      rot_t = ((int)(rot))*2;
+      float h = sqrt((r/2)*(r/2)+(r/2)*(r/2));
       beginShape(TRIANGLE_STRIP);
       texture(spriteSheet);
       tint(255, (timer/100.0)*155.0);
-      vertex(Math.floor(c.x), Math.floor(c.y), getUV(tex, "w"), getUV(tex, "n"));//nw
-      vertex(Math.floor(c.x), Math.floor(c.y+r), getUV(tex, "w"), getUV(tex, "s"));//sw
-      vertex(Math.floor(c.x+r), Math.floor(c.y), getUV(tex, "e"), getUV(tex, "n"));//ne
-      vertex(Math.floor(c.x+r), Math.floor(c.y+r), getUV(tex, "e"), getUV(tex, "s"));//se
+      vertex(Math.floor(loc.x)+h*ul[rot_t], Math.floor(loc.y)+h*ul[rot_t+1], getUV(tex, "w"), getUV(tex, "n"));//nw
+      vertex(Math.floor(loc.x)+h*ll[rot_t], Math.floor(loc.y)+h*ll[rot_t+1], getUV(tex, "w"), getUV(tex, "s"));//sw
+      vertex(Math.floor(loc.x)+h*ur[rot_t], Math.floor(loc.y)+h*ur[rot_t+1], getUV(tex, "e"), getUV(tex, "n"));//ne
+      vertex(Math.floor(loc.x)+h*lr[rot_t], Math.floor(loc.y)+h*lr[rot_t+1], getUV(tex, "e"), getUV(tex, "s"));//se
       endShape();
     }else{
       ellipseMode(CENTER);

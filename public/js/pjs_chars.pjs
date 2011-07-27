@@ -55,6 +55,7 @@ void setup()
   size( 800, 800, OPENGL );
   //smooth();
   fill( 0 );
+  buildRotationArrays();
   ellipseMode( CENTER );
   bodies = new ArrayList();  // Create an empty ArrayList
   ps = new ParticleSystem(1,new Vector3D(width/2,height/2,0));  
@@ -106,6 +107,7 @@ void draw()
   noStroke();
   beginShape(TRIANGLE_STRIP);
   texture(overlay);
+  tint(255, 255);
   vertex(0, 0, 0, 0); // nw
   vertex(0, height, 0, overlay.height); // sw
   vertex(width, 0, overlay.width, 0); // ne
