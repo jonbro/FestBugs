@@ -30,6 +30,7 @@ var loadPondFromUrl = function(){
       $.getJSON('/event/'+v.url, function(edata){
           appendEventBlock(edata, "#pond");
           attachEventEvents();
+          $("#empty_pond").fadeOut();
       });
     });
   });
