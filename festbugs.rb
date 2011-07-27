@@ -7,7 +7,7 @@ require 'net/http'
 require 'sequel'
 require 'json'
 
-DB = Sequel.connect(ENV['DATABASE_URL'] || "amalgalite://blog.db")
+DB = Sequel.connect(ENV['DATABASE_URL'] || "amalgalite://blog.sqlite")
 
 # data models!
 
@@ -46,9 +46,9 @@ end
 
 get '/search/:name' do
 	DIGEST = OpenSSL::Digest::Digest.new('sha1')
-	url = "/events?title=#{CGI::escape(params[:name])}&key=#{ENV['FESTIVAL_KEY']}"
+	url = "/events?title=#{CGI::unescape(params[:name])}&key=#{ENV['FESTIVAL_KEY']}"
 	sig = OpenSSL::HMAC.hexdigest(DIGEST, ENV['FESTIVAL_SECRET'], url)
-	url = "http://api.festivalslab.com"+url+"&signature=#{sig}"
+	url = "http://api.festivalslab.com"+"/events?title=#{CGI::escape(params[:name])}&key=#{ENV['FESTIVAL_KEY']}"+"&signature=#{sig}"
 	url = URI.parse(url)
 	# start the http object
 	resp = Net::HTTP.new(url.host).start{|http|
