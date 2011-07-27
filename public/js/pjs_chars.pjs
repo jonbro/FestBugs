@@ -65,6 +65,7 @@ void setup()
   //textureMode(NORMALIZED);
   hint(DISABLE_DEPTH_TEST);
   hint(ENABLE_OPENGL_4X_SMOOTH);
+  checkForLoaded();
 }
 void addBody(id, festival)
 {

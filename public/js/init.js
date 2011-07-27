@@ -35,7 +35,12 @@ var loadPondFromUrl = function(){
     });
   });
 };
-
+var checkForLoaded = function()
+{
+  if(document.location.hash){
+    loadPondFromUrl();
+  }
+}
 $(document).ready(function(){
   var synth = $("#audio_player");
   // wait for the canvas to load before kicking off the ajax stuff
@@ -76,9 +81,6 @@ $(document).ready(function(){
         // console.log($("#processing-canvas").get(0).getContext());
         p5 = new Processing(document.getElementById("processing-canvas"), processingCode);        
         // check to see if there is a pond in the url, and if so, fire off the requests that will give us the data about what to include in the pond
-        if(document.location.hash){
-          loadPondFromUrl()
-        }        
       }
     }
     // when the window resizes, resize the processing canvas to fit
