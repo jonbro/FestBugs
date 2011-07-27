@@ -51,12 +51,13 @@ class Particle {
 
   // Method to display
   void render() {
-    r = (timer+30)/2;
+    r = (100-timer+30)/2;
     c = new Vector3D(loc.x-r/2, loc.y-r/2);
     //loc.sub(r/2, r/2);
     if(tex){
       beginShape(TRIANGLE_STRIP);
       texture(spriteSheet);
+      tint(255, (timer/100.0)*155.0);
       vertex(Math.floor(c.x), Math.floor(c.y), getUV(tex, "w"), getUV(tex, "n"));//nw
       vertex(Math.floor(c.x), Math.floor(c.y+r), getUV(tex, "w"), getUV(tex, "s"));//sw
       vertex(Math.floor(c.x+r), Math.floor(c.y), getUV(tex, "e"), getUV(tex, "n"));//ne

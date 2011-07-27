@@ -2000,7 +2000,7 @@
       // If there were no lights this draw call, just use the
       // assigned fill color of the shape and the specular value
       "  if( lightCount == 0 ) {" +
-      "    frontColor = col + vec4(mat_specular,1.0);" +
+      "    frontColor = vec4( col.rgb + mat_specular.rgb, col[3] );" +
       "  }" +
       "  else {" +
            // WebGL forces us to iterate over a constant value
@@ -2062,11 +2062,12 @@
       "varying vec2 vTexture;" +
 
       // In Processing, when a texture is used, the fill color is ignored
+      // vec4(1.0,1.0,1.0,0.5)
       "void main(void){" +
       "  if(usingTexture){" +
-      "    gl_FragColor =  vec4(texture2D(sampler, vTexture.xy));" +
+      "    gl_FragColor = vec4(texture2D(sampler, vTexture.xy));" +
       "    if(usingTint){" +
-      "      gl_FragColor =  gl_FragColor*frontColor;" +
+      "      gl_FragColor = gl_FragColor*frontColor;" +
       "    }"+
       "  }"+
       "  else{" +
@@ -14591,7 +14592,7 @@
       };
       // for overriding the color buffer when 3d rendering
       curTint3d = function(data){
-        for(var i=0; i<data.length;){
+        for (var i = 0; i < data.length;) {
           data[i++] = r;
           data[i++] = g;
           data[i++] = b;

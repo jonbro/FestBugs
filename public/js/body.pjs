@@ -109,6 +109,7 @@ class Body{
       }
       beginShape(TRIANGLE_STRIP);
       texture(spriteSheet);
+      tint(255, 255);
       b = color((seg.length-i)/seg.length*255*(noteCounter/noteTime), (seg.length-i)/seg.length*255*(noteCounter/noteTime), (seg.length-i)/seg.length*255*(noteCounter/noteTime));
       vertex(seg[i].sw.GetWorldCenter().x*ratio, seg[i].sw.GetWorldCenter().y*ratio, getUV(sp, "w"), getUV(sp, "s"));
       vertex(seg[i].se.GetWorldCenter().x*ratio, seg[i].se.GetWorldCenter().y*ratio, getUV(sp, "e"), getUV(sp, "s"));
