@@ -133,8 +133,6 @@ class Body{
 
     // calculate a vector to the center of the screen from the head
     target = new b2Vec2((noise(millis()/p2+goalPhase)*width)/ratio, (noise(millis()/p2+goalPhase2)*height)/ratio); // TODO: I should stop hard coding this at some point
-    fill(c);
-    ellipse(target.x*ratio, target.y*ratio, 10, 10)
     headCenter = head.GetWorldCenter();
     target.Subtract(headCenter);
     target.Normalize();
@@ -146,12 +144,6 @@ class Body{
     // jam out on the arm
     armJoints[0].SetMotorSpeed(cos(millis()/1000));
     armJoints[1].SetMotorSpeed(-1*cos(millis()/1000));
-    // draw the hands
-    for (var i = 0; i < hands.length; i++) {
-      center = hands[i].GetWorldCenter();
-      fill(blendColor(c, color(255), SOFT_LIGHT));
-      ellipse(center.x*ratio, center.y*ratio, 20, 20);
-    };
 
     // count for the next note
     noteCounter -= ellapsed;

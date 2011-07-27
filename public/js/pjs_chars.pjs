@@ -153,7 +153,7 @@ void drawShape(shape,body) {
     case b2Shape.e_circleShape:
       var center = b2Math.MulX(body.m_xf, shape.m_p);
       var radius = shape.m_radius;
-      ellipse(center.x*ratio, center.y*ratio, radius*ratio*2, radius*ratio*2);
+      //ellipse(center.x*ratio, center.y*ratio, radius*ratio*2, radius*ratio*2);
     case b2Shape.e_polygonShape:
       poly = shape;
       // console.log(shape.GetType())
