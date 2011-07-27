@@ -22,14 +22,12 @@ var loadPondFromUrl = function(){
   // first, empty the pond
   // extract the pond id from the url
   var id = document.location.hash.split("_")[document.location.hash.split("_").length-1];
-  console.log("about to load");
   // fire off a json load
   $.getJSON('/pond/'+id, function(data){
     $.each(data, function(i,v){
       pond.push({'url':v.url, 'festival':v.festival});
       p5.addBody(v.url, v.festival);
       $.getJSON('/event/'+v.url, function(edata){
-        console.log(edata);
           appendEventBlock(edata, "#pond");
           attachEventEvents();
       });
@@ -41,12 +39,28 @@ $(document).ready(function(){
   var synth = $("#audio_player");
   // wait for the canvas to load before kicking off the ajax stuff
   $(window).load(function(){
+    // before setting up processing, check for webgl
+    var contextNames = ['experimental-webgl', 'webgl', 'webkit-3d'];
+    var noGl = true;
+    for(var i = 0; i < contextNames.length; i++){
+      try { //Needed for unsupported browsers, otherwise it gets caught up on the next line
+        var context = document.getElementById("test-canvas").getContext(contextNames[i]);
+        if(context) {
+          noGl = noGl && false;
+        }
+      }
+      catch(e) {
+      }
+    }
+    if(noGl){
+      document.location = "/noGl.html";
+    }
+    $("#test-canvas").remove();
     var loadCount = 0;
     var toExecute = new Array();
     // this gets kicked off after all the files have been loaded
     var downloadComplete = function(){
       loadCount++;
-      console.log(loadCount, toLoad.length);
 
       if (loadCount >= toLoad.length){
         var processingCode = "";
@@ -59,7 +73,7 @@ $(document).ready(function(){
         // setup the processing context with the source code
         // console.log(document.getElementById("processing-canvas").getContext
         // console.log($("#processing-canvas").get(0).getContext());
-        p5 = new Processing(document.getElementById("processing-canvas"), processingCode);
+        p5 = new Processing(document.getElementById("processing-canvas"), processingCode);        
         // check to see if there is a pond in the url, and if so, fire off the requests that will give us the data about what to include in the pond
         if(document.location.hash){
           loadPondFromUrl()
@@ -84,7 +98,6 @@ $(document).ready(function(){
           url: v,
           dataType: 'script',
           success: function(data){
-            console.log(v);
             downloadComplete();
           }
         });
@@ -93,7 +106,6 @@ $(document).ready(function(){
           url: v,
           dataType: 'text',
           success: function(data){
-            console.log(v);
             toExecute[i] = data;
             downloadComplete();
           }
@@ -103,7 +115,6 @@ $(document).ready(function(){
           url: v,
           dataType: 'json',
           success: function(data){
-            console.log(v);
             ssData = data;
             downloadComplete();
           }
