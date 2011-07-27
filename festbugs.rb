@@ -7,7 +7,7 @@ require 'net/http'
 require 'sequel'
 require 'json'
 
-DB = Sequel.connect(ENV['DATABASE_URL'] || "amalgalite://blog.sqlite")
+DB = Sequel.connect(ENV['DATABASE_URL'] || "amalgalite://db.sqlite")
 
 # data models!
 
