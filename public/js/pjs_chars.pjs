@@ -1,4 +1,4 @@
-/* @pjs preload="/img/sheet.png,/img/microscope_overlay.png"; */
+/* @pjs preload="/img/sheet.png, /img/microscope_overlay.png"; */
 
 ParticleSystem physics;
 
@@ -58,17 +58,10 @@ void setup()
   buildRotationArrays();
   ellipseMode( CENTER );
   bodies = new ArrayList();  // Create an empty ArrayList
-  ps = new ParticleSystem(1,new Vector3D(width/2,height/2,0));  
-
-  //bodies = new Body[0];
-  /*for (var i = 0; i < bodies.length; i++) {
-    bodies[i] = new Body(Math.ceil(random(2,10)), Math.random()*500, Math.random()*400, Math.random()*40+10, Math.random()*40+10);
-  };
-  */
-
+  ps = new ParticleSystem(0,new Vector3D(width/2,height/2,0));  
   lastTime = 0;
-  spriteSheet = loadImage("img/sheet.png");
-  overlay = loadImage("img/microscope_overlay.png");
+  overlay = loadImage("/img/microscope_overlay.png");
+  spriteSheet = loadImage("/img/sheet.png");
   //textureMode(NORMALIZED);
   hint(DISABLE_DEPTH_TEST);
   hint(ENABLE_OPENGL_4X_SMOOTH);
@@ -89,21 +82,25 @@ void removeBody(bodyId){
 }
 void draw()
 {
+
   background(0xE8fffa);
   rect(0,0,width, height);
+  
   ps.run();  
   //ps.addParticle();
+  
   for (var i = 0; i < bodies.size(); i++) {
     Body body = (Body) bodies.get(i);
     body.draw();
   };
-  update();
+    
   world.Step(1 / 60, 15, 15);
   world.DrawDebugData();
   world.ClearForces();
   ellapsed = frameCount*30-lastTime;
   lastTime = frameCount*30;
   // draw the overlay
+  
   noStroke();
   beginShape(TRIANGLE_STRIP);
   texture(overlay);
@@ -149,12 +146,6 @@ float getUV(frame, corner){
   }
   return 0;
 };
-
-void update() {
-
-
-};
-
 
 void drawShape(shape,body) {
   switch(shape.m_type){

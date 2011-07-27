@@ -5,7 +5,7 @@ var p5;
 var pond = Array(); // contains a list of the bugs that are in the current pond
 var removeUrlFromPond = function(url){
   for (var i = pond.length - 1; i >= 0; i--) {
-    if(pond[i] == url){
+    if(pond[i].url == url){
       pond.splice(i, 1);
       return;
     }

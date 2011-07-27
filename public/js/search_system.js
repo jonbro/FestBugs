@@ -48,6 +48,13 @@ var attachEventEvents = function(){
 		p5.addBody(url, festival);
 		$(this).parent().appendTo('#pond');
 		hidePondLink();
+		if(pond.length == 0){
+			$("#get_pond_link").fadeOut();
+			$("#empty_pond").fadeIn();
+		}else{
+			$("#get_pond_link").fadeIn();
+			$("#empty_pond").fadeOut();
+		}
 		return false;
 	});
 	$('.from_pond').click(function(){
@@ -56,15 +63,15 @@ var attachEventEvents = function(){
 		removeUrlFromPond(url);
 		$(this).parent().remove();	
 		hidePondLink();
+		if(pond.length == 0){
+			$("#get_pond_link").fadeOut();
+			$("#empty_pond").fadeIn();
+		}else{
+			$("#get_pond_link").fadeIn();
+			$("#empty_pond").fadeOut();
+		}
 		return false;
 	});
-	if(!pond.length){
-		$("#get_pond_link").fadeOut();
-		$("#empty_pond").fadeIn();
-	}else{
-		$("#get_pond_link").fadeIn();
-		$("#empty_pond").fadeOut();
-	}
 };
 
 var appendEventBlock = function(data, target){
