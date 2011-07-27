@@ -1,5 +1,5 @@
 // lets load all the processing stuff over ajax and execute it once it has all been loaded
-var toLoad = ["js/sheet.json", "js/search_system.js", "js/processing-24accf5.min.js", "js/Box2dWeb-2.1.a.3.js", "js/ParticleSystem.pjs", "js/body.pjs", "js/pjs_chars.pjs", "js/seedrandom.js"];
+var toLoad = ["js/sheet.json", "js/search_system.js", "js/processing-24accf5.min.js", "js/Box2dWeb-2.1.a.3.min.js", "js/ParticleSystem.pjs", "js/body.pjs", "js/pjs_chars.pjs", "js/seedrandom.js"];
 var mute = false;
 var p5;
 var pond = Array(); // contains a list of the bugs that are in the current pond
